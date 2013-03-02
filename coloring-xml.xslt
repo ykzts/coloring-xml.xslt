@@ -20,7 +20,9 @@ a { color: inherit; text-decoration: underline }
 .comment { color: silver }
 .text { white-space: pre }
 .character-reference { color: lime }]]></style>
-        <title>xml2html</title>
+        <title>
+          <xsl:value-of select="concat(name(*), ' document')"/>
+        </title>
       </head>
       <body>
         <ol>
