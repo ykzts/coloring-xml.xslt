@@ -12,6 +12,7 @@
 body { background-color: whiter }
 ol { list-style: none }
 ol ol { margin-left: 1em }
+.xml-declaration .name { color: aqua }
 .processing-instruction .name { color: aqua }
 .tag .name { color: blue }
 .attribute .name { color: maroon }
@@ -21,7 +22,13 @@ ol ol { margin-left: 1em }
       </head>
       <body>
         <ol>
-          <li>&lt;?xml version="1.0"?&gt;</li>
+          <li>
+            <span class="xml-declaration">
+              <xsl:text>&lt;?</xsl:text>
+              <span class="name">xml</span>
+              <xsl:text> version="1.0"?&gt;</xsl:text>
+            </span>
+          </li>
           <xsl:apply-templates/>
         </ol>
       </body>
