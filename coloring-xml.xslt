@@ -12,11 +12,13 @@
 body { background-color: whiter }
 ol { list-style: none }
 ol ol { margin-left: 1em }
+a { color: inherit; text-decoration: underline }
 .xml-declaration .name { color: aqua }
 .processing-instruction .name { color: aqua }
 .tag .name { color: blue }
 .attribute .name { color: maroon }
 .attribute .value { color: green }
+.comment { color: silver }
 ]]></style>
         <title>xml2html</title>
       </head>
@@ -116,7 +118,18 @@ ol ol { margin-left: 1em }
       </span>
       <xsl:text>=</xsl:text>
       <span class="value">
-        <xsl:value-of select="concat('&quot;', ., '&quot;')"/>
+        <xsl:text>"</xsl:text>
+        <xsl:choose>
+          <xsl:when test="local-name = 'href' or starts-with(., 'http://') or starts-with(., 'https://')">
+            <a href="{.}">
+              <xsl:value-of select="."/>
+            </a>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="."/>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:text>"</xsl:text>
       </span>
     </span>
   </xsl:template>
