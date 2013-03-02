@@ -3,6 +3,7 @@
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
   <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="yes" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
   <xsl:strip-space elements="*"/>
+
   <xsl:template match="/">
     <html>
       <head>
@@ -26,6 +27,7 @@ ol ol { margin-left: 1em }
       </body>
     </html>
   </xsl:template>
+
   <xsl:template match="processing-instruction()">
     <li>
       <span class="processing-instruction">
@@ -38,6 +40,7 @@ ol ol { margin-left: 1em }
       </span>
     </li>
   </xsl:template>
+
   <xsl:template match="text()">
     <xsl:value-of select="."/>
   </xsl:template>
@@ -48,11 +51,13 @@ ol ol { margin-left: 1em }
       </li>
     </ol>
   </xsl:template>
+
   <xsl:template match="*">
     <li>
       <xsl:call-template name="tag"/>
     </li>
   </xsl:template>
+
   <xsl:template name="tag">
     <span class="tag">
       <xsl:text>&lt;</xsl:text>
@@ -85,6 +90,7 @@ ol ol { margin-left: 1em }
       </span>
     </xsl:if>
   </xsl:template>
+
   <xsl:template match="@*">
     <xsl:text> </xsl:text>
     <span class="attribute">
