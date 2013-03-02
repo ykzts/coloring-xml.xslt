@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?xml-stylesheet type="application/xml" href=""?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-  <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="yes" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+  <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
   <xsl:strip-space elements="*"/>
 
   <xsl:template match="/">
     <html>
       <head>
-        <style type="text/css"><![CDATA[
-* { margin: 0; padding: 0 }
-body { background-color: whiter }
+        <style type="text/css"><![CDATA[* { margin: 0; padding: 0 }
+body { font-family: monospace; background-color: white }
 ol { list-style: none }
 ol ol { margin-left: 1em }
 a { color: inherit; text-decoration: underline }
@@ -19,7 +18,7 @@ a { color: inherit; text-decoration: underline }
 .attribute .name { color: maroon }
 .attribute .value { color: green }
 .comment { color: silver }
-]]></style>
+.text { white-space: pre }]]></style>
         <title>xml2html</title>
       </head>
       <body>
@@ -54,19 +53,20 @@ a { color: inherit; text-decoration: underline }
     <li>
       <span class="comment">
         <xsl:text>&lt;!--</xsl:text>
-        <xsl:value-of select="."/>
+        <xsl:call-template name="plain-text"/>
         <xsl:text>--&gt;</xsl:text>
       </span>
     </li>
   </xsl:template>
 
   <xsl:template match="text()">
-    <xsl:value-of select="."/>
+    <xsl:call-template name="plain-text"/>
   </xsl:template>
+
   <xsl:template match="text()[string-length(.) &gt; 100]">
     <ol>
       <li>
-        <xsl:value-of select="."/>
+        <xsl:call-template name="plain-text"/>
       </li>
     </ol>
   </xsl:template>
@@ -131,6 +131,12 @@ a { color: inherit; text-decoration: underline }
         </xsl:choose>
         <xsl:text>"</xsl:text>
       </span>
+    </span>
+  </xsl:template>
+
+  <xsl:template name="plain-text">
+    <span class="text">
+      <xsl:value-of select="."/>
     </span>
   </xsl:template>
 </xsl:stylesheet>
