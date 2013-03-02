@@ -39,9 +39,14 @@ ol ol { margin-left: 1em }
     </li>
   </xsl:template>
   <xsl:template match="text()">
-    <li>
-      <xsl:value-of select="."/>
-    </li>
+    <xsl:value-of select="."/>
+  </xsl:template>
+  <xsl:template match="text()[string-length(.) &gt; 100]">
+    <ol>
+      <li>
+        <xsl:value-of select="."/>
+      </li>
+    </ol>
   </xsl:template>
   <xsl:template match="*">
     <li>
@@ -68,7 +73,7 @@ ol ol { margin-left: 1em }
           </ol>
         </xsl:when>
         <xsl:when test="text()">
-          <xsl:value-of select="text()"/>
+          <xsl:apply-templates select="text()"/>
         </xsl:when>
       </xsl:choose>
       <span class="tag">
