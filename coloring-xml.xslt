@@ -130,6 +130,10 @@ a { color: inherit; text-decoration: underline }
 
   <xsl:template match="@*">
     <xsl:text> </xsl:text>
+    <xsl:call-template name="attribute"/>
+  </xsl:template>
+
+  <xsl:template name="attribute">
     <span class="attribute">
       <span class="name">
         <xsl:value-of select="name()"/>
