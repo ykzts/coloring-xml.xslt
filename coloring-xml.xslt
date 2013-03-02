@@ -18,7 +18,8 @@ a { color: inherit; text-decoration: underline }
 .attribute .name { color: maroon }
 .attribute .value { color: green }
 .comment { color: silver }
-.text { white-space: pre }]]></style>
+.text { white-space: pre }
+.character-reference { color: lime }]]></style>
         <title>xml2html</title>
       </head>
       <body>
@@ -132,26 +133,97 @@ a { color: inherit; text-decoration: underline }
         <xsl:value-of select="name()"/>
       </span>
       <xsl:text>=</xsl:text>
-      <span class="value">
-        <xsl:text>"</xsl:text>
-        <xsl:choose>
-          <xsl:when test="local-name = 'href' or starts-with(., 'http://') or starts-with(., 'https://')">
-            <a href="{.}">
-              <xsl:value-of select="."/>
-            </a>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select="."/>
-          </xsl:otherwise>
-        </xsl:choose>
-        <xsl:text>"</xsl:text>
-      </span>
+      <xsl:call-template name="attribute-value"/>
     </span>
+  </xsl:template>
+
+  <xsl:template name="attribute-value">
+    <span class="value">
+      <xsl:text>&quot;</xsl:text>
+      <xsl:choose>
+        <xsl:when test="local-name = 'href' or starts-with(., 'http://') or starts-with(., 'https://')">
+          <a href="{.}">
+            <xsl:call-template name="attribute-value-text"/>
+          </a>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="attribute-value-text"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:text>&quot;</xsl:text>
+    </span>
+  </xsl:template>
+
+  <xsl:template name="attribute-value-text">
+    <xsl:call-template name="replace-character">
+      <xsl:with-param name="text" select="."/>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template name="plain-text">
     <span class="text">
-      <xsl:value-of select="."/>
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="."/>
+      </xsl:call-template>
     </span>
+  </xsl:template>
+
+  <xsl:template name="replace-character">
+    <xsl:param name="text"/>
+    <xsl:choose>
+      <xsl:when test="contains($text, '&amp;')">
+        <xsl:call-template name="replace-character2">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="from" select="'&amp;'"/>
+          <xsl:with-param name="to" select="'&amp;amp;'"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($text, '&lt;')">
+        <xsl:call-template name="replace-character2">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="from" select="'&lt;'"/>
+          <xsl:with-param name="to" select="'&amp;lt;'"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($text, '&gt;')">
+        <xsl:call-template name="replace-character2">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="from" select="'&gt;'"/>
+          <xsl:with-param name="to" select="'&amp;gt;'"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="contains($text, '&quot;')">
+        <xsl:call-template name="replace-character2">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="from" select="'&quot;'"/>
+          <xsl:with-param name="to" select="'&amp;quot;'"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="replace-character2">
+    <xsl:param name="text"/>
+    <xsl:param name="from"/>
+    <xsl:param name="to"/>
+    <xsl:if test="contains($text, $from)">
+      <xsl:value-of select="substring-before($text, $from)"/>
+      <xsl:choose>
+        <xsl:when test="starts-with($to, '&amp;') and substring($to, string-length($to), 1) = ';'">
+          <span class="character-reference" title="{$from}">
+            <xsl:value-of select="$to"/>
+          </span>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$to"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="substring-after($text, $from)"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
