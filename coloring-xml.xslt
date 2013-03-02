@@ -48,6 +48,16 @@ ol ol { margin-left: 1em }
     </li>
   </xsl:template>
 
+  <xsl:template match="comment()">
+    <li>
+      <span class="comment">
+        <xsl:text>&lt;!--</xsl:text>
+        <xsl:value-of select="."/>
+        <xsl:text>--&gt;</xsl:text>
+      </span>
+    </li>
+  </xsl:template>
+
   <xsl:template match="text()">
     <xsl:value-of select="."/>
   </xsl:template>
