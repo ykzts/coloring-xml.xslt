@@ -171,37 +171,40 @@ a { color: inherit; text-decoration: underline }
   <xsl:template name="replace-character">
     <xsl:param name="text"/>
     <xsl:choose>
-      <xsl:when test="contains($text, '&amp;')">
+      <xsl:when test="starts-with($text, '&amp;')">
         <xsl:call-template name="replace-character2">
           <xsl:with-param name="text" select="$text"/>
           <xsl:with-param name="from" select="'&amp;'"/>
           <xsl:with-param name="to" select="'&amp;amp;'"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="contains($text, '&lt;')">
+      <xsl:when test="starts-with($text, '&lt;')">
         <xsl:call-template name="replace-character2">
           <xsl:with-param name="text" select="$text"/>
           <xsl:with-param name="from" select="'&lt;'"/>
           <xsl:with-param name="to" select="'&amp;lt;'"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="contains($text, '&gt;')">
+      <xsl:when test="starts-with($text, '&gt;')">
         <xsl:call-template name="replace-character2">
           <xsl:with-param name="text" select="$text"/>
           <xsl:with-param name="from" select="'&gt;'"/>
           <xsl:with-param name="to" select="'&amp;gt;'"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="contains($text, '&quot;')">
+      <xsl:when test="starts-with($text, '&quot;')">
         <xsl:call-template name="replace-character2">
           <xsl:with-param name="text" select="$text"/>
           <xsl:with-param name="from" select="'&quot;'"/>
           <xsl:with-param name="to" select="'&amp;quot;'"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="$text"/>
-      </xsl:otherwise>
+      <xsl:when test="string-length($text) &gt; 0">
+        <xsl:value-of select="substring($text, 1, 1)"/>
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="substring($text, 2)"/>
+        </xsl:call-template>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
@@ -209,8 +212,7 @@ a { color: inherit; text-decoration: underline }
     <xsl:param name="text"/>
     <xsl:param name="from"/>
     <xsl:param name="to"/>
-    <xsl:if test="contains($text, $from)">
-      <xsl:value-of select="substring-before($text, $from)"/>
+    <xsl:if test="starts-with($text, $from)">
       <xsl:choose>
         <xsl:when test="starts-with($to, '&amp;') and substring($to, string-length($to), 1) = ';'">
           <span class="character-reference" title="{$from}">
