@@ -129,7 +129,7 @@ a { color: inherit; text-decoration: underline }
   </xsl:template>
 
   <xsl:template match="@*">
-    <xsl:text> </xsl:text>
+    <xsl:text>&#160;</xsl:text>
     <xsl:call-template name="attribute"/>
   </xsl:template>
 
@@ -203,6 +203,13 @@ a { color: inherit; text-decoration: underline }
           <xsl:with-param name="text" select="$text"/>
           <xsl:with-param name="from" select="'&quot;'"/>
           <xsl:with-param name="to" select="'&amp;quot;'"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="starts-with($text, '&#160;')">
+        <xsl:call-template name="replace-character2">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="from" select="'&#160;'"/>
+          <xsl:with-param name="to" select="'&amp;nbsp;'"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="string-length($text) &gt; 0">
