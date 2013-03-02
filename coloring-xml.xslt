@@ -14,7 +14,7 @@ ol ol { margin-left: 1em }
 a { color: inherit; text-decoration: underline }
 .xml-declaration .name { color: aqua }
 .processing-instruction .name { color: aqua }
-.tag .name { color: blue }
+.tag .name span { color: blue }
 .attribute .name { color: maroon }
 .attribute .value { color: green }
 .comment { color: silver }
@@ -73,22 +73,12 @@ a { color: inherit; text-decoration: underline }
 
   <xsl:template match="*">
     <li>
-      <xsl:call-template name="tag"/>
+      <xsl:call-template name="element"/>
     </li>
   </xsl:template>
 
-  <xsl:template name="tag">
-    <span class="tag">
-      <xsl:text>&lt;</xsl:text>
-      <span class="name">
-        <xsl:value-of select="name()"/>
-      </span>
-      <xsl:apply-templates select="@*"/>
-      <xsl:if test="not(node())">
-        <xsl:text>/</xsl:text>
-      </xsl:if>
-      <xsl:text>&gt;</xsl:text>
-    </span>
+  <xsl:template name="element">
+    <xsl:call-template name="tag"/>
     <xsl:if test="node()">
       <xsl:choose>
         <xsl:when test="*">
@@ -100,14 +90,39 @@ a { color: inherit; text-decoration: underline }
           <xsl:apply-templates select="text()"/>
         </xsl:when>
       </xsl:choose>
-      <span class="tag">
-        <xsl:text>&lt;/</xsl:text>
-        <span class="name">
-          <xsl:value-of select="name()"/>
-        </span>
-        <xsl:text>&gt;</xsl:text>
-      </span>
+      <xsl:call-template name="tag">
+        <xsl:with-param name="is-close-tag" select="true()"/>
+      </xsl:call-template>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="tag">
+    <xsl:param name="prefix" select="substring-before(name(), ':')"/>
+    <xsl:param name="is-close-tag" select="false()"/>
+    <span class="tag">
+      <xsl:text>&lt;</xsl:text>
+      <xsl:if test="$is-close-tag">
+        <xsl:text>/</xsl:text>
+      </xsl:if>
+      <span class="name">
+        <xsl:if test="$prefix">
+          <span class="prefix">
+            <xsl:value-of select="$prefix"/>
+          </span>
+          <xsl:text>:</xsl:text>
+        </xsl:if>
+        <span class="local-name">
+          <xsl:value-of select="local-name()"/>
+        </span>
+      </span>
+      <xsl:if test="not($is-close-tag)">
+        <xsl:apply-templates select="@*"/>
+        <xsl:if test="not(node())">
+          <xsl:text>/</xsl:text>
+        </xsl:if>
+      </xsl:if>
+      <xsl:text>&gt;</xsl:text>
+    </span>
   </xsl:template>
 
   <xsl:template match="@*">
