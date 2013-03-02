@@ -141,7 +141,7 @@ a { color: inherit; text-decoration: underline }
     <span class="value">
       <xsl:text>&quot;</xsl:text>
       <xsl:choose>
-        <xsl:when test="local-name = 'href' or starts-with(., 'http://') or starts-with(., 'https://')">
+        <xsl:when test="local-name() = 'href' or starts-with(., 'http://') or starts-with(., 'https://')">
           <a href="{.}">
             <xsl:call-template name="attribute-value-text"/>
           </a>
