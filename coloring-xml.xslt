@@ -308,7 +308,7 @@ a { color: inherit; text-decoration: underline }
         <xsl:call-template name="replace-character2">
           <xsl:with-param name="text" select="$text"/>
           <xsl:with-param name="from" select="'&#160;'"/>
-          <xsl:with-param name="to" select="'&amp;nbsp;'"/>
+          <xsl:with-param name="to" select="'&amp;#160;'"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="string-length($text) &gt; 0">
