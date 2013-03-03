@@ -31,11 +31,10 @@ a { color: inherit; text-decoration: underline }
               <xsl:text>&lt;?</xsl:text>
               <span class="name">xml</span>
               <xsl:text>&#160;</xsl:text>
-              <span class="attribute">
-                <span class="name">version</span>
-                <xsl:text>=</xsl:text>
-                <span class="value">&quot;1.0&quot;</span>
-              </span>
+              <xsl:call-template name="attribute">
+                <xsl:with-param name="name">version</xsl:with-param>
+                <xsl:with-param name="value">1.0</xsl:with-param>
+              </xsl:call-template>
               <xsl:text>?&gt;</xsl:text>
             </span>
           </li>
@@ -81,16 +80,10 @@ a { color: inherit; text-decoration: underline }
     <xsl:param name="name"/>
     <xsl:param name="value"/>
     <xsl:text>&#160;</xsl:text>
-    <span class="attribute">
-      <span class="name">
-        <xsl:value-of select="$name"/>
-      </span>
-      <xsl:text>=</xsl:text>
-      <xsl:call-template name="attribute-value">
-        <xsl:with-param name="name" select="$name"/>
-        <xsl:with-param name="value" select="$value"/>
-      </xsl:call-template>
-    </span>
+    <xsl:call-template name="attribute">
+      <xsl:with-param name="name" select="$name"/>
+      <xsl:with-param name="value" select="$value"/>
+    </xsl:call-template>
   </xsl:template>
 
   <xsl:template match="comment()">
@@ -175,14 +168,23 @@ a { color: inherit; text-decoration: underline }
   </xsl:template>
 
   <xsl:template name="element-attribute">
+    <xsl:call-template name="attribute">
+      <xsl:with-param name="name" select="name()"/>
+      <xsl:with-param name="value" select="."/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="attribute">
+    <xsl:param name="name"/>
+    <xsl:param name="value"/>
     <span class="attribute">
       <span class="name">
-        <xsl:value-of select="name()"/>
+        <xsl:value-of select="$name"/>
       </span>
       <xsl:text>=</xsl:text>
       <xsl:call-template name="attribute-value">
-        <xsl:with-param name="name" select="name()"/>
-        <xsl:with-param name="value" select="."/>
+        <xsl:with-param name="name" select="$name"/>
+        <xsl:with-param name="value" select="$value"/>
       </xsl:call-template>
     </span>
   </xsl:template>
