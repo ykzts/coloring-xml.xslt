@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?xml-stylesheet type="application/xml" href=""?>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xml:lang="en">
   <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
   <xsl:strip-space elements="*"/>
 
   <xsl:template match="/">
-    <html xml:lang="en">
+    <xsl:param name="lang">
+      <xsl:choose>
+        <xsl:when test="/*/@xml:lang">
+          <xsl:value-of select="/*/@xml:lang"/>
+        </xsl:when>
+        <xsl:when test="/*/@lang">
+          <xsl:value-of select="/*/@lang"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>en</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    <html xml:lang="{$lang}" lang="{$lang}">
       <head>
         <style type="text/css"><![CDATA[* { margin: 0; padding: 0 }
 body { font-family: monospace; line-height: 1.5; background-color: white }
