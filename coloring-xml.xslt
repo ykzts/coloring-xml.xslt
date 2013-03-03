@@ -30,21 +30,23 @@
       <body>
         <ol>
           <li>
-            <span class="xml-declaration">
-              <xsl:text>&lt;?</xsl:text>
-              <span class="name">xml</span>
-              <xsl:text>&#160;</xsl:text>
-              <xsl:call-template name="attribute">
-                <xsl:with-param name="name">version</xsl:with-param>
-                <xsl:with-param name="value">1.0</xsl:with-param>
-              </xsl:call-template>
-              <xsl:text>?&gt;</xsl:text>
-            </span>
+            <xsl:call-template name="xml-declaration"/>
           </li>
           <xsl:apply-templates/>
         </ol>
       </body>
     </html>
+  </xsl:template>
+
+  <xsl:template name="xml-declaration">
+    <span class="xml-declaration">
+      <xsl:text>&lt;?</xsl:text>
+      <span class="name">xml</span>
+      <xsl:call-template name="processing-instruction-attributes">
+        <xsl:with-param name="attributes">version=&quot;1.0&quot;</xsl:with-param>
+      </xsl:call-template>
+      <xsl:text>?&gt;</xsl:text>
+    </span>
   </xsl:template>
 
   <xsl:template match="processing-instruction()">
