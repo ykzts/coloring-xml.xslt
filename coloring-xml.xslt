@@ -227,7 +227,7 @@ a { color: inherit; text-decoration: underline }
     <span class="value">
       <xsl:text>&quot;</xsl:text>
       <xsl:choose>
-        <xsl:when test="$value and $name = 'href' or substring-after($name, ':') = 'href' or starts-with($value, 'http://') or starts-with($value, 'https://')">
+        <xsl:when test="$value and $name = 'href' or $name ='src' or substring-after($name, ':') = 'href' or starts-with($value, 'http://') or starts-with($value, 'https://')">
           <a href="{$value}">
             <xsl:call-template name="attribute-value-text">
               <xsl:with-param name="text" select="$value"/>
