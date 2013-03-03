@@ -21,7 +21,7 @@
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
         <style type="text/css"><![CDATA[* { margin: 0; padding: 0 }
-body { font-family: monospace; line-height: 1.5; background-color: white }
+body { font-family: monospace; line-height: 1.5; background-color: white; margin: .5em }
 ol { list-style: none }
 ol ol { margin-left: 1em }
 a { color: inherit; text-decoration: underline }
