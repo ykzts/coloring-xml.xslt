@@ -154,24 +154,15 @@ a { color: inherit; text-decoration: underline }
   </xsl:template>
 
   <xsl:template name="tag">
-    <xsl:param name="prefix" select="substring-before(name(), ':')"/>
     <xsl:param name="is-close-tag" select="false()"/>
     <span class="tag">
       <xsl:text>&lt;</xsl:text>
       <xsl:if test="$is-close-tag">
         <xsl:text>/</xsl:text>
       </xsl:if>
-      <span class="name">
-        <xsl:if test="$prefix">
-          <span class="prefix">
-            <xsl:value-of select="$prefix"/>
-          </span>
-          <xsl:text>:</xsl:text>
-        </xsl:if>
-        <span class="local-name">
-          <xsl:value-of select="local-name()"/>
-        </span>
-      </span>
+      <xsl:call-template name="name">
+        <xsl:with-param name="name" select="name()"/>
+      </xsl:call-template>
       <xsl:if test="not($is-close-tag)">
         <xsl:apply-templates select="@*"/>
         <xsl:if test="not(node())">
@@ -190,29 +181,36 @@ a { color: inherit; text-decoration: underline }
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template name="name">
+    <xsl:param name="name"/>
+    <xsl:param name="prefix" select="substring-before($name, ':')"/>
+    <span class="name">
+      <xsl:choose>
+        <xsl:when test="$prefix">
+          <span class="prefix">
+            <xsl:value-of select="$prefix"/>
+          </span>
+          <xsl:text>:</xsl:text>
+          <span class="local-name">
+            <xsl:value-of select="substring-after($name, ':')"/>
+          </span>
+        </xsl:when>
+        <xsl:otherwise>
+          <span class="local-name">
+            <xsl:value-of select="$name"/>
+          </span>
+        </xsl:otherwise>
+      </xsl:choose>
+    </span>
+  </xsl:template>
+
   <xsl:template name="attribute">
     <xsl:param name="name"/>
     <xsl:param name="value"/>
-    <xsl:param name="prefix" select="substring-before($name, ':')"/>
     <span class="attribute">
-      <span class="name">
-        <xsl:choose>
-          <xsl:when test="$prefix">
-            <span class="prefix">
-              <xsl:value-of select="$prefix"/>
-            </span>
-            <xsl:text>:</xsl:text>
-            <span class="local-name">
-              <xsl:value-of select="substring-after($name, ':')"/>
-            </span>
-          </xsl:when>
-          <xsl:otherwise>
-            <span calss="local-name">
-              <xsl:value-of select="$name"/>
-            </span>
-          </xsl:otherwise>
-        </xsl:choose>
-      </span>
+      <xsl:call-template name="name">
+        <xsl:with-param name="name" select="$name"/>
+      </xsl:call-template>
       <xsl:text>=</xsl:text>
       <xsl:call-template name="attribute-value">
         <xsl:with-param name="name" select="$name"/>
