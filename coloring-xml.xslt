@@ -97,10 +97,30 @@ a { color: inherit; text-decoration: underline }
   </xsl:template>
 
   <xsl:template match="text()">
-    <xsl:call-template name="plain-text"/>
+    <xsl:choose>
+      <xsl:when test="preceding-sibling::* or following-sibling::*">
+        <li>
+          <xsl:call-template name="text-node"/>
+        </li>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="text-node"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="text()[string-length(.) &gt; 100]">
+  <xsl:template name="text-node">
+    <xsl:choose>
+      <xsl:when test="string-length(.) &gt; 100">
+        <xsl:call-template name="text-node-long"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="plain-text"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="text-node-long">
     <ol>
       <li>
         <xsl:call-template name="plain-text"/>
