@@ -20,19 +20,9 @@
     </xsl:param>
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
-        <style type="text/css"><![CDATA[* { margin: 0; padding: 0 }
-body { font-family: monospace; line-height: 1.5; background-color: white; margin: .5em }
-ol { list-style: none }
-ol ol { margin-left: 1em }
-a { color: inherit; text-decoration: underline }
-.xml-declaration .name { color: aqua }
-.processing-instruction .name { color: aqua }
-.tag .name span { color: blue }
-.attribute .name span { color: maroon }
-.attribute .value { color: green }
-.comment { color: silver }
-.text { white-space: pre }
-.character-reference { color: lime }]]></style>
+        <style type="text/css">
+          <xsl:call-template name="stylesheet"/>
+        </style>
         <title>
           <xsl:value-of select="concat(name(*), ' document')"/>
         </title>
@@ -340,4 +330,18 @@ a { color: inherit; text-decoration: underline }
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
+
+  <xsl:template name="stylesheet"><![CDATA[* { margin: 0; padding: 0 }
+body { font-family: monospace; line-height: 1.5; background-color: white; margin: .5em }
+ol { list-style: none }
+ol ol { margin-left: 1em }
+a { color: inherit; text-decoration: underline }
+.xml-declaration .name { color: aqua }
+.processing-instruction .name { color: aqua }
+.tag .name span { color: blue }
+.attribute .name span { color: maroon }
+.attribute .value { color: green }
+.comment { color: silver }
+.text { white-space: pre }
+.character-reference { color: lime }]]></xsl:template>
 </xsl:stylesheet>
