@@ -224,10 +224,13 @@ a { color: inherit; text-decoration: underline }
   <xsl:template name="attribute-value">
     <xsl:param name="name"/>
     <xsl:param name="value"/>
+    <xsl:param name="is-href" select="$name = 'href' or substring-after($name, ':') = 'href'"/>
+    <xsl:param name="is-src" select="$name = 'src' or substring-after($name, ':') = 'src'"/>
+    <xsl:param name="value-is-uri" select="starts-with($value, 'http://') or starts-with($value, 'https://')"/>
     <span class="value">
       <xsl:text>&quot;</xsl:text>
       <xsl:choose>
-        <xsl:when test="$value and $name = 'href' or $name ='src' or substring-after($name, ':') = 'href' or starts-with($value, 'http://') or starts-with($value, 'https://')">
+        <xsl:when test="$value and $is-href or $is-src or $value-is-uri">
           <a href="{$value}">
             <xsl:call-template name="attribute-value-text">
               <xsl:with-param name="text" select="$value"/>
