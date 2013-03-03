@@ -68,25 +68,56 @@
 
   <xsl:template name="processing-instruction-attributes">
     <xsl:param name="attributes"/>
-    <xsl:if test="string-length($attributes) &gt; 0">
+    <xsl:param name="before-first-space">
+      <xsl:choose>
+        <xsl:when test="contains(substring-before($attributes, '&quot;'), ' ')">
+          <xsl:value-of select="substring-before($attributes, ' ')"/>
+        </xsl:when>
+        <xsl:when test="substring-before($attributes, '&quot; ')">
+          <xsl:value-of select="substring-before($attributes, '&quot;')"/>
+          <xsl:text>&quot;</xsl:text>
+          <xsl:value-of select="substring-before(substring-after($attributes, '&quot;'), '&quot;')"/>
+          <xsl:text>&quot;</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$attributes"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:param>
+    <xsl:param name="after-first-space">
+      <xsl:if test="string-length($before-first-space) &gt; 0">
+        <xsl:value-of select="substring-after($attributes, concat($before-first-space, ' '))"/>
+      </xsl:if>
+    </xsl:param>
+    <xsl:if test="string-length($before-first-space) &gt; 0">
       <xsl:call-template name="processing-instruction-attribute">
-        <xsl:with-param name="name" select="normalize-space(substring-before($attributes, '='))"/>
-        <xsl:with-param name="value" select="substring-before(substring-after($attributes, '=&quot;'), '&quot;')"/>
+        <xsl:with-param name="attribute" select="$before-first-space"/>
       </xsl:call-template>
+    </xsl:if>
+    <xsl:if test="string-length($after-first-space) &gt; 0">
       <xsl:call-template name="processing-instruction-attributes">
-        <xsl:with-param name="attributes" select="substring-after(substring-after($attributes, '=&quot;'), '&quot;')"/>
+        <xsl:with-param name="attributes" select="$after-first-space"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="processing-instruction-attribute">
-    <xsl:param name="name"/>
-    <xsl:param name="value"/>
+    <xsl:param name="attribute"/>
+    <xsl:param name="name" select="substring-before($attribute, '=&quot;')"/>
     <xsl:text>&#160;</xsl:text>
-    <xsl:call-template name="attribute">
-      <xsl:with-param name="name" select="$name"/>
-      <xsl:with-param name="value" select="$value"/>
-    </xsl:call-template>
+    <xsl:choose>
+      <xsl:when test="$name and substring($attribute, string-length($attribute), 1) = '&quot;'">
+        <xsl:call-template name="attribute">
+          <xsl:with-param name="name" select="$name"/>
+          <xsl:with-param name="value" select="substring-before(substring-after($attribute, concat($name, '=&quot;')), '&quot;')"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <span class="string">
+          <xsl:value-of select="$attribute"/>
+        </span>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="comment()">
@@ -338,6 +369,7 @@ ol ol { margin-left: 1em }
 a { color: inherit; text-decoration: underline }
 .xml-declaration .name { color: aqua }
 .processing-instruction .name { color: aqua }
+.processing-instruction .string { color: maroon }
 .tag .name span { color: blue }
 .attribute .name span { color: maroon }
 .attribute .value { color: green }
