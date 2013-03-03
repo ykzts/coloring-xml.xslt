@@ -164,10 +164,6 @@ a { color: inherit; text-decoration: underline }
 
   <xsl:template match="@*">
     <xsl:text>&#160;</xsl:text>
-    <xsl:call-template name="element-attribute"/>
-  </xsl:template>
-
-  <xsl:template name="element-attribute">
     <xsl:call-template name="attribute">
       <xsl:with-param name="name" select="name()"/>
       <xsl:with-param name="value" select="."/>
