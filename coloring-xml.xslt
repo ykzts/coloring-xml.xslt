@@ -172,13 +172,13 @@
     <xsl:call-template name="tag"/>
     <xsl:if test="node()">
       <xsl:choose>
-        <xsl:when test="not(text())">
+        <xsl:when test="text()[not(preceding-sibling::* or following-sibling::*)]">
+          <xsl:apply-templates select="text()"/>
+        </xsl:when>
+        <xsl:otherwise>
           <ol>
             <xsl:apply-templates/>
           </ol>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="text()"/>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:call-template name="tag">
