@@ -366,6 +366,7 @@
 body { font-family: monospace; line-height: 1.5; background-color: white; margin: .5em }
 ol { list-style: none }
 ol ol { margin-left: 1em }
+li { white-space: nowrap }
 a { color: inherit; text-decoration: underline }
 .xml-declaration .name { color: aqua }
 .processing-instruction .name { color: aqua }
