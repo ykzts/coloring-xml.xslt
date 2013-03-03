@@ -141,14 +141,14 @@
     <xsl:call-template name="tag"/>
     <xsl:if test="node()">
       <xsl:choose>
-        <xsl:when test="*">
+        <xsl:when test="not(text())">
           <ol>
             <xsl:apply-templates/>
           </ol>
         </xsl:when>
-        <xsl:when test="text()">
+        <xsl:otherwise>
           <xsl:apply-templates select="text()"/>
-        </xsl:when>
+        </xsl:otherwise>
       </xsl:choose>
       <xsl:call-template name="tag">
         <xsl:with-param name="is-close-tag" select="true()"/>
