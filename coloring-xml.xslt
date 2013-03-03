@@ -30,7 +30,13 @@ a { color: inherit; text-decoration: underline }
             <span class="xml-declaration">
               <xsl:text>&lt;?</xsl:text>
               <span class="name">xml</span>
-              <xsl:text> version="1.0"?&gt;</xsl:text>
+              <xsl:text>&#160;</xsl:text>
+              <span class="attribute">
+                <span class="name">version</span>
+                <xsl:text>=</xsl:text>
+                <span class="value">&quot;1.0&quot;</span>
+              </span>
+              <xsl:text>?&gt;</xsl:text>
             </span>
           </li>
           <xsl:apply-templates/>
@@ -41,15 +47,50 @@ a { color: inherit; text-decoration: underline }
 
   <xsl:template match="processing-instruction()">
     <li>
-      <span class="processing-instruction">
-        <xsl:text>&lt;?</xsl:text>
-        <span class="name">
-          <xsl:value-of select="name()"/>
-        </span>
-        <xsl:value-of select="concat(' ', .)"/>
-        <xsl:text>?&gt;</xsl:text>
-      </span>
+      <xsl:call-template name="processing-instruction"/>
     </li>
+  </xsl:template>
+
+  <xsl:template name="processing-instruction">
+    <span class="processing-instruction">
+      <xsl:text>&lt;?</xsl:text>
+      <span class="name">
+        <xsl:value-of select="name()"/>
+      </span>
+      <xsl:call-template name="processing-instruction-attributes">
+        <xsl:with-param name="attributes" select="normalize-space(.)"/>
+      </xsl:call-template>
+      <xsl:text>?&gt;</xsl:text>
+    </span>
+  </xsl:template>
+
+  <xsl:template name="processing-instruction-attributes">
+    <xsl:param name="attributes"/>
+    <xsl:if test="string-length($attributes) &gt; 0">
+      <xsl:call-template name="processing-instruction-attribute">
+        <xsl:with-param name="name" select="normalize-space(substring-before($attributes, '='))"/>
+        <xsl:with-param name="value" select="substring-before(substring-after($attributes, '=&quot;'), '&quot;')"/>
+      </xsl:call-template>
+      <xsl:call-template name="processing-instruction-attributes">
+        <xsl:with-param name="attributes" select="substring-after(substring-after($attributes, '=&quot;'), '&quot;')"/>
+      </xsl:call-template>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="processing-instruction-attribute">
+    <xsl:param name="name"/>
+    <xsl:param name="value"/>
+    <xsl:text>&#160;</xsl:text>
+    <span class="attribute">
+      <span class="name">
+        <xsl:value-of select="$name"/>
+      </span>
+      <xsl:text>=</xsl:text>
+      <xsl:call-template name="attribute-value">
+        <xsl:with-param name="name" select="$name"/>
+        <xsl:with-param name="value" select="$value"/>
+      </xsl:call-template>
+    </span>
   </xsl:template>
 
   <xsl:template match="comment()">
@@ -130,30 +171,39 @@ a { color: inherit; text-decoration: underline }
 
   <xsl:template match="@*">
     <xsl:text>&#160;</xsl:text>
-    <xsl:call-template name="attribute"/>
+    <xsl:call-template name="element-attribute"/>
   </xsl:template>
 
-  <xsl:template name="attribute">
+  <xsl:template name="element-attribute">
     <span class="attribute">
       <span class="name">
         <xsl:value-of select="name()"/>
       </span>
       <xsl:text>=</xsl:text>
-      <xsl:call-template name="attribute-value"/>
+      <xsl:call-template name="attribute-value">
+        <xsl:with-param name="name" select="name()"/>
+        <xsl:with-param name="value" select="."/>
+      </xsl:call-template>
     </span>
   </xsl:template>
 
   <xsl:template name="attribute-value">
+    <xsl:param name="name"/>
+    <xsl:param name="value"/>
     <span class="value">
       <xsl:text>&quot;</xsl:text>
       <xsl:choose>
-        <xsl:when test="local-name() = 'href' or starts-with(., 'http://') or starts-with(., 'https://')">
-          <a href="{.}">
-            <xsl:call-template name="attribute-value-text"/>
+        <xsl:when test="$value and $name = 'href' or substring-after($name, ':') = 'href' or starts-with($value, 'http://') or starts-with($value, 'https://')">
+          <a href="{$value}">
+            <xsl:call-template name="attribute-value-text">
+              <xsl:with-param name="text" select="$value"/>
+            </xsl:call-template>
           </a>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:call-template name="attribute-value-text"/>
+          <xsl:call-template name="attribute-value-text">
+            <xsl:with-param name="text" select="$value"/>
+          </xsl:call-template>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text>&quot;</xsl:text>
@@ -161,8 +211,9 @@ a { color: inherit; text-decoration: underline }
   </xsl:template>
 
   <xsl:template name="attribute-value-text">
+    <xsl:param name="text"/>
     <xsl:call-template name="replace-character">
-      <xsl:with-param name="text" select="."/>
+      <xsl:with-param name="text" select="$text"/>
     </xsl:call-template>
   </xsl:template>
 
