@@ -5,7 +5,7 @@
   <xsl:strip-space elements="*"/>
 
   <xsl:template match="/">
-    <html>
+    <html xml:lang="en">
       <head>
         <style type="text/css"><![CDATA[* { margin: 0; padding: 0 }
 body { font-family: monospace; line-height: 1.5; background-color: white }
@@ -15,7 +15,7 @@ a { color: inherit; text-decoration: underline }
 .xml-declaration .name { color: aqua }
 .processing-instruction .name { color: aqua }
 .tag .name span { color: blue }
-.attribute .name { color: maroon }
+.attribute .name span { color: maroon }
 .attribute .value { color: green }
 .comment { color: silver }
 .text { white-space: pre }
@@ -173,9 +173,25 @@ a { color: inherit; text-decoration: underline }
   <xsl:template name="attribute">
     <xsl:param name="name"/>
     <xsl:param name="value"/>
+    <xsl:param name="prefix" select="substring-before($name, ':')"/>
     <span class="attribute">
       <span class="name">
-        <xsl:value-of select="$name"/>
+        <xsl:choose>
+          <xsl:when test="$prefix">
+            <span class="prefix">
+              <xsl:value-of select="$prefix"/>
+            </span>
+            <xsl:text>:</xsl:text>
+            <span class="local-name">
+              <xsl:value-of select="substring-after($name, ':')"/>
+            </span>
+          </xsl:when>
+          <xsl:otherwise>
+            <span calss="local-name">
+              <xsl:value-of select="$name"/>
+            </span>
+          </xsl:otherwise>
+        </xsl:choose>
       </span>
       <xsl:text>=</xsl:text>
       <xsl:call-template name="attribute-value">
