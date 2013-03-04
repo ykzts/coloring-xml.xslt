@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?xml-stylesheet type="application/xml" href=""?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xml:lang="en">
-  <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+  <xsl:param name="lang">
+    <xsl:choose>
+      <xsl:when test="/*/@xml:lang">
+        <xsl:value-of select="/*/@xml:lang"/>
+      </xsl:when>
+      <xsl:when test="/*/@lang">
+        <xsl:value-of select="/*/@lang"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>en</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:param>
   <xsl:strip-space elements="*"/>
+  <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
 
   <xsl:template match="/">
-    <xsl:param name="lang">
-      <xsl:choose>
-        <xsl:when test="/*/@xml:lang">
-          <xsl:value-of select="/*/@xml:lang"/>
-        </xsl:when>
-        <xsl:when test="/*/@lang">
-          <xsl:value-of select="/*/@lang"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:text>en</xsl:text>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:param>
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
         <style type="text/css">
@@ -70,7 +70,7 @@
 
   <xsl:template name="processing-instruction-attributes">
     <xsl:param name="attributes"/>
-    <xsl:param name="before-first-space">
+    <xsl:variable name="before-first-space">
       <xsl:choose>
         <xsl:when test="contains(substring-before($attributes, '&quot;'), ' ')">
           <xsl:value-of select="substring-before($attributes, ' ')"/>
@@ -85,12 +85,12 @@
           <xsl:value-of select="$attributes"/>
         </xsl:otherwise>
       </xsl:choose>
-    </xsl:param>
-    <xsl:param name="after-first-space">
+    </xsl:variable>
+    <xsl:variable name="after-first-space">
       <xsl:if test="string-length($before-first-space) &gt; 0">
         <xsl:value-of select="substring-after($attributes, concat($before-first-space, ' '))"/>
       </xsl:if>
-    </xsl:param>
+    </xsl:variable>
     <xsl:if test="string-length($before-first-space) &gt; 0">
       <xsl:call-template name="processing-instruction-attribute">
         <xsl:with-param name="attribute" select="$before-first-space"/>
@@ -105,7 +105,7 @@
 
   <xsl:template name="processing-instruction-attribute">
     <xsl:param name="attribute"/>
-    <xsl:param name="name" select="substring-before($attribute, '=&quot;')"/>
+    <xsl:variable name="name" select="substring-before($attribute, '=&quot;')"/>
     <xsl:text>&#160;</xsl:text>
     <xsl:choose>
       <xsl:when test="$name and substring($attribute, string-length($attribute), 1) = '&quot;'">
@@ -219,7 +219,7 @@
 
   <xsl:template name="name">
     <xsl:param name="name"/>
-    <xsl:param name="prefix" select="substring-before($name, ':')"/>
+    <xsl:variable name="prefix" select="substring-before($name, ':')"/>
     <span class="name">
       <xsl:choose>
         <xsl:when test="$prefix">
@@ -258,9 +258,9 @@
   <xsl:template name="attribute-value">
     <xsl:param name="name"/>
     <xsl:param name="value"/>
-    <xsl:param name="is-href" select="$name = 'href' or substring-after($name, ':') = 'href'"/>
-    <xsl:param name="is-src" select="$name = 'src' or substring-after($name, ':') = 'src'"/>
-    <xsl:param name="value-is-uri" select="starts-with($value, 'http://') or starts-with($value, 'https://')"/>
+    <xsl:variable name="is-href" select="$name = 'href' or substring-after($name, ':') = 'href'"/>
+    <xsl:variable name="is-src" select="$name = 'src' or substring-after($name, ':') = 'src'"/>
+    <xsl:variable name="value-is-uri" select="starts-with($value, 'http://') or starts-with($value, 'https://')"/>
     <span class="value">
       <xsl:text>&quot;</xsl:text>
       <xsl:choose>
