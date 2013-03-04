@@ -14,6 +14,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:param>
+  <xsl:param name="encoding"/>
   <xsl:strip-space elements="*"/>
   <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
 
@@ -39,11 +40,19 @@
   </xsl:template>
 
   <xsl:template name="xml-declaration">
+    <xsl:variable name="attributes">
+      <xsl:text>version=&quot;1.0&quot;</xsl:text>
+      <xsl:if test="$encoding">
+        <xsl:text> encoding=&quot;</xsl:text>
+        <xsl:value-of select="$encoding"/>
+        <xsl:text>&quot;</xsl:text>
+      </xsl:if>
+    </xsl:variable>
     <span class="xml-declaration">
       <xsl:text>&lt;?</xsl:text>
       <span class="name">xml</span>
       <xsl:call-template name="processing-instruction-attributes">
-        <xsl:with-param name="attributes">version=&quot;1.0&quot;</xsl:with-param>
+        <xsl:with-param name="attributes" select="$attributes"/>
       </xsl:call-template>
       <xsl:text>?&gt;</xsl:text>
     </span>
