@@ -220,10 +220,16 @@
   <xsl:template name="name">
     <xsl:param name="name"/>
     <xsl:variable name="prefix" select="substring-before($name, ':')"/>
+    <xsl:variable name="namespace" select="namespace-uri(.)"/>
     <span class="name">
       <xsl:choose>
         <xsl:when test="$prefix">
           <span class="prefix">
+            <xsl:if test="$namespace">
+              <xsl:attribute name="title">
+                <xsl:value-of select="$namespace"/>
+              </xsl:attribute>
+            </xsl:if>
             <xsl:value-of select="$prefix"/>
           </span>
           <xsl:text>:</xsl:text>
@@ -233,6 +239,11 @@
         </xsl:when>
         <xsl:otherwise>
           <span class="local-name">
+            <xsl:if test="$namespace">
+              <xsl:attribute name="title">
+                <xsl:value-of select="$namespace"/>
+              </xsl:attribute>
+            </xsl:if>
             <xsl:value-of select="$name"/>
           </span>
         </xsl:otherwise>
