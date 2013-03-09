@@ -267,6 +267,11 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:element name="{$element-name}">
+      <xsl:if test="@id">
+        <xsl:attribute name="id">
+          <xsl:value-of select="@id"/>
+        </xsl:attribute>
+      </xsl:if>
       <xsl:attribute name="class">tag</xsl:attribute>
       <xsl:text>&lt;</xsl:text>
       <xsl:if test="$is-close-tag">
