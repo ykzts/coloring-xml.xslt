@@ -223,6 +223,11 @@
 
   <xsl:template name="element">
     <xsl:variable name="many-attributes" select="count(@*) &gt;= 5"/>
+    <xsl:if test="@id">
+      <xsl:attribute name="id">
+        <xsl:value-of select="@id"/>
+      </xsl:attribute>
+    </xsl:if>
     <xsl:call-template name="tag">
       <xsl:with-param name="many-attributes" select="$many-attributes"/>
     </xsl:call-template>
@@ -267,11 +272,6 @@
       </xsl:choose>
     </xsl:variable>
     <xsl:element name="{$element-name}">
-      <xsl:if test="@id">
-        <xsl:attribute name="id">
-          <xsl:value-of select="@id"/>
-        </xsl:attribute>
-      </xsl:if>
       <xsl:attribute name="class">tag</xsl:attribute>
       <xsl:text>&lt;</xsl:text>
       <xsl:if test="$is-close-tag">
