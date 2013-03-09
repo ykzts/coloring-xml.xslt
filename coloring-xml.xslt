@@ -474,53 +474,72 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template name="stylesheet"><![CDATA[* {
+  <xsl:template name="stylesheet"><![CDATA[/* layout */
+* {
   margin: 0;
   padding: 0;
+  color: inherit;
 }
+
 body {
   font-family: monospace;
   line-height: 1.5;
-  background-color: white;
   margin: .5em;
 }
+
 ol {
   list-style: none;
 }
+
 ol ol {
   margin-left: 1em;
 }
+
 li {
   white-space: nowrap;
 }
+
 a {
-  color: inherit;
   text-decoration: underline;
 }
-.xml-declaration .name {
-  color: aqua;
-}
-.processing-instruction .name {
-  color: aqua;
-}
-.processing-instruction .string {
-  color: maroon;
-}
-.tag .name span {
-  color: blue;
-}
-.attribute .name span {
-  color: maroon;
-}
-.attribute .value {
-  color: green;
-}
-.comment {
-  color: silver;
-}
+
 .text {
   white-space: pre;
 }
+
+/* color */
+body {
+  background-color: white;
+}
+
+.xml-declaration .name {
+  color: aqua;
+}
+
+.processing-instruction .name {
+  color: aqua;
+}
+
+.processing-instruction .string {
+  color: maroon;
+}
+
+.tag .name span {
+  color: blue;
+}
+
+.attribute .name span {
+  color: maroon;
+}
+
+.attribute .value {
+  color: green;
+}
+
+.comment {
+  color: silver;
+}
+
 .character-reference {
   color: lime;
 }]]></xsl:template>
