@@ -167,7 +167,9 @@
     <li>
       <span class="comment">
         <xsl:text>&lt;!--</xsl:text>
-        <xsl:call-template name="plain-text"/>
+        <xsl:call-template name="plain-text">
+          <xsl:with-param name="text" select="."/>
+        </xsl:call-template>
         <xsl:text>--&gt;</xsl:text>
       </span>
     </li>
@@ -393,7 +395,7 @@
   </xsl:template>
 
   <xsl:template name="plain-text">
-    <xsl:param name="text" select="$text"/>
+    <xsl:param name="text" select="."/>
     <span class="text">
       <xsl:call-template name="replace-character">
         <xsl:with-param name="text" select="$text"/>
