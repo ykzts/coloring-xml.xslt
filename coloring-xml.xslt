@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?xml-stylesheet type="application/xml" href=""?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xml:lang="en">
   <xsl:param name="lang">
@@ -20,7 +20,7 @@
   <xsl:variable name="upper-case">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
   <xsl:variable name="lower-case">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:strip-space elements="*"/>
-  <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+  <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
 
   <xsl:template name="guess-encoding">
     <xsl:variable name="html-encoding">
@@ -212,7 +212,7 @@
   </xsl:template>
 
   <xsl:template name="element">
-    <xsl:variable name="many-attributes" select="count(@*) &gt;= 3"/>
+    <xsl:variable name="many-attributes" select="count(@*) &gt;= 5"/>
     <xsl:call-template name="tag">
       <xsl:with-param name="many-attributes" select="$many-attributes"/>
     </xsl:call-template>
