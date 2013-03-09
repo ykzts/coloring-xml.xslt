@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?xml-stylesheet type="application/xml" href=""?>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xml:lang="en">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xml:lang="en">
   <xsl:param name="lang">
     <xsl:choose>
       <xsl:when test="/*/@xml:lang">
@@ -14,9 +14,41 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:param>
-  <xsl:param name="encoding"/>
+  <xsl:param name="encoding">
+    <xsl:call-template name="guess-encoding"/>
+  </xsl:param>
+  <xsl:variable name="upper-case">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
+  <xsl:variable name="lower-case">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:strip-space elements="*"/>
   <xsl:output method="xml" encoding="utf-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+
+  <xsl:template name="guess-encoding">
+    <xsl:variable name="html-encoding">
+      <xsl:if test="/*[local-name() = 'html' and namespace-uri() = 'http://www.w3.org/1999/xhtml']">
+        <xsl:call-template name="guess-encoding-html"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="string-length($html-encoding) &gt; 0">
+        <xsl:value-of select="$html-encoding"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>UTF-8</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="guess-encoding-html">
+    <xsl:variable name="meta-element" select="/xhtml:html/xhtml:head/xhtml:meta[@charset or translate(@http-equiv, $upper-case, $lower-case) = 'content-type'][last()]"/>
+    <xsl:choose>
+      <xsl:when test="$meta-element/@charset">
+        <xsl:value-of select="$meta-element/@charset"/>
+      </xsl:when>
+      <xsl:when test="$meta-element/@http-equiv">
+        <xsl:value-of select="substring-after($meta-element/@content, 'charset=')"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template match="/">
     <html xml:lang="{$lang}" lang="{$lang}">
