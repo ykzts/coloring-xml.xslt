@@ -53,6 +53,7 @@
   <xsl:template match="/">
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
+        <meta http-equiv="Content-Type" content="text/html; charset={$encoding}"/>
         <style type="text/css">
           <xsl:call-template name="stylesheet"/>
         </style>
