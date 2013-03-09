@@ -14,6 +14,12 @@ Coloring to xml document using XSLT stylesheet! I love XSLT!!! XSLT is a greates
 </document>
 ```
 
+or
+
+```shell
+$ xsltproc coloring-xml.xslt document.xml > document.html
+```
+
 ## License
 
 [MIT License](LICENSE)
