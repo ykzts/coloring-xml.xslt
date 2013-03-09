@@ -187,20 +187,28 @@
   </xsl:template>
 
   <xsl:template name="text-node">
+    <xsl:param name="text" select="."/>
     <xsl:choose>
       <xsl:when test="string-length(.) &gt; 100">
-        <xsl:call-template name="text-node-long"/>
+        <xsl:call-template name="text-node-long">
+          <xsl:with-param name="text" select="$text"/>
+        </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="plain-text"/>
+        <xsl:call-template name="plain-text">
+          <xsl:with-param name="text" select="$text"/>
+        </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template name="text-node-long">
+    <xsl:param name="text" select="."/>
     <ol>
       <li>
-        <xsl:call-template name="plain-text"/>
+        <xsl:call-template name="plain-text">
+          <xsl:with-param name="text" select="$text"/>
+        </xsl:call-template>
       </li>
     </ol>
   </xsl:template>
@@ -221,11 +229,9 @@
         <xsl:when test="text()[not(preceding-sibling::* or following-sibling::*)]">
           <xsl:choose>
             <xsl:when test="$many-attributes">
-              <ol>
-                <li>
-                  <xsl:apply-templates select="text()"/>
-                </li>
-              </ol>
+              <xsl:call-template name="text-node-long">
+                <xsl:with-param name="text" select="text()"/>
+              </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
               <xsl:apply-templates select="text()"/>
@@ -307,7 +313,7 @@
   <xsl:template name="name">
     <xsl:param name="name"/>
     <xsl:variable name="prefix" select="substring-before($name, ':')"/>
-    <xsl:variable name="namespace-uri" select="namespace-uri(.)"/>
+    <xsl:variable name="namespace-uri" select="namespace-uri()"/>
     <span class="name">
       <xsl:choose>
         <xsl:when test="$prefix">
@@ -387,9 +393,10 @@
   </xsl:template>
 
   <xsl:template name="plain-text">
+    <xsl:param name="text" select="$text"/>
     <span class="text">
       <xsl:call-template name="replace-character">
-        <xsl:with-param name="text" select="."/>
+        <xsl:with-param name="text" select="$text"/>
       </xsl:call-template>
     </span>
   </xsl:template>
