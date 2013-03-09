@@ -212,11 +212,25 @@
   </xsl:template>
 
   <xsl:template name="element">
-    <xsl:call-template name="tag"/>
+    <xsl:variable name="many-attributes" select="count(@*) &gt;= 3"/>
+    <xsl:call-template name="tag">
+      <xsl:with-param name="many-attributes" select="$many-attributes"/>
+    </xsl:call-template>
     <xsl:if test="node()">
       <xsl:choose>
         <xsl:when test="text()[not(preceding-sibling::* or following-sibling::*)]">
-          <xsl:apply-templates select="text()"/>
+          <xsl:choose>
+            <xsl:when test="$many-attributes">
+              <ol>
+                <li>
+                  <xsl:apply-templates select="text()"/>
+                </li>
+              </ol>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="text()"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:when>
         <xsl:otherwise>
           <ol>
@@ -226,13 +240,26 @@
       </xsl:choose>
       <xsl:call-template name="tag">
         <xsl:with-param name="is-close-tag" select="true()"/>
+        <xsl:with-param name="many-attributes" select="$many-attributes"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
 
   <xsl:template name="tag">
     <xsl:param name="is-close-tag" select="false()"/>
-    <span class="tag">
+    <xsl:param name="many-attributes" select="false()"/>
+    <xsl:variable name="element-name">
+      <xsl:choose>
+        <xsl:when test="$many-attributes">
+          <xsl:text>div</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>span</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:element name="{$element-name}">
+      <xsl:attribute name="class">tag</xsl:attribute>
       <xsl:text>&lt;</xsl:text>
       <xsl:if test="$is-close-tag">
         <xsl:text>/</xsl:text>
@@ -241,17 +268,36 @@
         <xsl:with-param name="name" select="name()"/>
       </xsl:call-template>
       <xsl:if test="not($is-close-tag)">
-        <xsl:apply-templates select="@*"/>
+        <xsl:choose>
+          <xsl:when test="$many-attributes">
+            <ol>
+              <xsl:apply-templates select="@*" mode="many-attributes"/>
+            </ol>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="@*"/>
+          </xsl:otherwise>
+        </xsl:choose>
         <xsl:if test="not(node())">
           <xsl:text>/</xsl:text>
         </xsl:if>
       </xsl:if>
       <xsl:text>&gt;</xsl:text>
-    </span>
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="@*">
     <xsl:text>&#160;</xsl:text>
+    <xsl:call-template name="html-attribute"/>
+  </xsl:template>
+
+  <xsl:template match="@*" mode="many-attributes">
+    <li>
+      <xsl:call-template name="html-attribute"/>
+    </li>
+  </xsl:template>
+
+  <xsl:template name="html-attribute">
     <xsl:call-template name="attribute">
       <xsl:with-param name="name" select="name()"/>
       <xsl:with-param name="value" select="."/>
