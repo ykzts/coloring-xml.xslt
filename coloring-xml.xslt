@@ -167,9 +167,7 @@
     <li>
       <span class="comment">
         <xsl:text>&lt;!--</xsl:text>
-        <xsl:call-template name="plain-text">
-          <xsl:with-param name="text" select="."/>
-        </xsl:call-template>
+        <xsl:value-of select="."/>
         <xsl:text>--&gt;</xsl:text>
       </span>
     </li>
