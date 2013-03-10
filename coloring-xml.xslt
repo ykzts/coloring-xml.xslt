@@ -435,7 +435,7 @@
           <xsl:text>;</xsl:text>
         </span>
         <xsl:call-template name="character-reference">
-          <xsl:with-param name="text" select="substring-after($text, ';')"/>
+          <xsl:with-param name="text" select="substring-after(substring-after($text, '&amp;'), ';')"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
