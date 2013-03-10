@@ -20,7 +20,7 @@
   <xsl:variable name="upper-case">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
   <xsl:variable name="lower-case">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:strip-space elements="*"/>
-  <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+  <xsl:output method="html" encoding="UTF-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
 
   <xsl:template name="guess-encoding">
     <xsl:variable name="html-encoding">
@@ -68,6 +68,9 @@
           </li>
           <xsl:apply-templates/>
         </ol>
+        <script type="application/javascript">
+          <xsl:call-template name="script"/>
+        </script>
       </body>
     </html>
   </xsl:template>
@@ -508,6 +511,18 @@ a {
   white-space: pre;
 }
 
+li.closed > .tag {
+  display: inline;
+}
+
+li.closed > .tag:first-child:not(:only-child)::after {
+  content: "...";
+}
+
+li.closed > :not(.tag) {
+  display: none;
+}
+
 /* color */
 body {
   background-color: white;
@@ -544,4 +559,56 @@ body {
 .character-reference {
   color: lime;
 }]]></xsl:template>
+
+  <xsl:template name="script"><![CDATA[(function(global, undefined) {
+  'use strict';
+
+  var window = global.window || {};
+  var document = window.document;
+
+  function SiteScript() {
+  }
+
+  (function(proto) {
+    proto.handleEvent = function handleEvent(event) {
+      var type = event.type;
+      if (type === 'DOMContentLoaded') {
+        return this.domContentLoaded(event);
+      }
+    };
+
+    proto.domContentLoaded = function domContentLoaded(event) {
+      var nodes = document.querySelectorAll('.tag:not(:only-child)');
+      [].forEach.call(nodes, function(node) {
+        node.addEventListener('click', new Tag(node), false);
+      });
+    };
+  })(SiteScript.prototype);
+
+  function Tag(node) {
+    if (!((this.node = node) instanceof HTMLElement && (this.parentNode = node.parentNode) instanceof HTMLElement)) {
+      throw new TypeError('This class has argument should contains `HTMLElement` object.');
+    }
+    if (!((this.classList = this.node.classList) instanceof DOMTokenList && (this.parentClassList = this.parentNode.classList) instanceof DOMTokenList)) {
+      throw new TypeError('Should support a `classList` property.');
+    }
+    if (!this.classList.contains('tag')) {
+      throw new TypeError('Node is should has class attribute contains of value is tag.');
+    }
+  }
+
+  (function(proto) {
+    proto.handleEvent = function handleEvent(event) {
+      this.parentClassList.toggle('closed');
+    };
+  })(Tag.prototype);
+
+  function main() {
+    window.addEventListener('DOMContentLoaded', new SiteScript(), false);
+  }
+
+  if (window === global) {
+    main();
+  }
+})(this);]]></xsl:template>
 </xsl:stylesheet>
