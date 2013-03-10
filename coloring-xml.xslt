@@ -20,7 +20,7 @@
   <xsl:variable name="upper-case">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
   <xsl:variable name="lower-case">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:strip-space elements="*"/>
-  <xsl:output method="html" encoding="UTF-8" omit-xml-declaration="no" media-type="text/html" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
+  <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" media-type="application/xhtml+xml" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
 
   <xsl:template name="guess-encoding">
     <xsl:variable name="html-encoding">
@@ -54,9 +54,16 @@
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset={$encoding}"/>
-        <style type="text/css">
-          <xsl:call-template name="stylesheet"/>
-        </style>
+        <link rel="stylesheet" type="text/css">
+          <xsl:attribute name="href">
+            <xsl:call-template name="data-uri">
+              <xsl:with-param name="content-type">text/css</xsl:with-param>
+              <xsl:with-param name="text">
+                <xsl:call-template name="stylesheet"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
+         </link>
         <title>
           <xsl:value-of select="concat(name(*), ' document')"/>
         </title>
@@ -69,7 +76,14 @@
           <xsl:apply-templates/>
         </ol>
         <script type="application/javascript">
-          <xsl:call-template name="script"/>
+          <xsl:attribute name="src">
+            <xsl:call-template name="data-uri">
+              <xsl:with-param name="content-type">application/javascript</xsl:with-param>
+              <xsl:with-param name="text">
+                <xsl:call-template name="script"/>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:attribute>
         </script>
       </body>
     </html>
@@ -396,7 +410,7 @@
 
   <xsl:template name="attribute-value-text">
     <xsl:param name="text"/>
-    <xsl:call-template name="replace-character">
+    <xsl:call-template name="escape">
       <xsl:with-param name="text" select="$text"/>
     </xsl:call-template>
   </xsl:template>
@@ -404,81 +418,165 @@
   <xsl:template name="plain-text">
     <xsl:param name="text" select="."/>
     <span class="text">
-      <xsl:call-template name="replace-character">
+      <xsl:call-template name="escape">
         <xsl:with-param name="text" select="$text"/>
       </xsl:call-template>
     </span>
   </xsl:template>
 
-  <xsl:template name="replace-character">
+  <xsl:template name="character-reference">
     <xsl:param name="text"/>
     <xsl:choose>
-      <xsl:when test="starts-with($text, '&amp;')">
-        <xsl:call-template name="replace-character2">
-          <xsl:with-param name="text" select="$text"/>
-          <xsl:with-param name="from" select="'&amp;'"/>
-          <xsl:with-param name="to" select="'&amp;amp;'"/>
+      <xsl:when test="contains($text, '&amp;')">
+        <xsl:value-of select="substring-before($text, '&amp;')"/>
+        <span class="character-reference">
+          <xsl:text>&amp;</xsl:text>
+          <xsl:value-of select="substring-before(substring-after($text, '&amp;'), ';')"/>
+          <xsl:text>;</xsl:text>
+        </span>
+        <xsl:call-template name="character-reference">
+          <xsl:with-param name="text" select="substring-after($text, ';')"/>
         </xsl:call-template>
       </xsl:when>
-      <xsl:when test="starts-with($text, '&lt;')">
-        <xsl:call-template name="replace-character2">
-          <xsl:with-param name="text" select="$text"/>
-          <xsl:with-param name="from" select="'&lt;'"/>
-          <xsl:with-param name="to" select="'&amp;lt;'"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="starts-with($text, '&gt;')">
-        <xsl:call-template name="replace-character2">
-          <xsl:with-param name="text" select="$text"/>
-          <xsl:with-param name="from" select="'&gt;'"/>
-          <xsl:with-param name="to" select="'&amp;gt;'"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="starts-with($text, '&quot;')">
-        <xsl:call-template name="replace-character2">
-          <xsl:with-param name="text" select="$text"/>
-          <xsl:with-param name="from" select="'&quot;'"/>
-          <xsl:with-param name="to" select="'&amp;quot;'"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="starts-with($text, '&#160;')">
-        <xsl:call-template name="replace-character2">
-          <xsl:with-param name="text" select="$text"/>
-          <xsl:with-param name="from" select="'&#160;'"/>
-          <xsl:with-param name="to" select="'&amp;#160;'"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="string-length($text) &gt; 0">
-        <xsl:value-of select="substring($text, 1, 1)"/>
-        <xsl:call-template name="replace-character">
-          <xsl:with-param name="text" select="substring($text, 2)"/>
-        </xsl:call-template>
-      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="replace-character2">
+  <xsl:template name="data-uri">
+    <xsl:param name="content-type">text/plain</xsl:param>
+    <xsl:param name="charset">UTF-8</xsl:param>
+    <xsl:param name="text" select="''"/>
+    <xsl:value-of select="concat('data:', $content-type, ';charset=', $charset, ',')"/>
+    <xsl:call-template name="percent-encoding">
+      <xsl:with-param name="text" select="$text"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="escape">
+    <xsl:param name="text"/>
+    <xsl:variable name="escaped-text">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text">
+          <xsl:call-template name="replace-character">
+            <xsl:with-param name="text">
+              <xsl:call-template name="replace-character">
+                <xsl:with-param name="text">
+                  <xsl:call-template name="replace-character">
+                    <xsl:with-param name="text">
+                      <xsl:call-template name="replace-character">
+                        <xsl:with-param name="text" select="$text"/>
+                        <xsl:with-param name="from" select="'&amp;'"/>
+                        <xsl:with-param name="to" select="'&amp;amp;'"/>
+                      </xsl:call-template>
+                    </xsl:with-param>
+                    <xsl:with-param name="from" select="'&lt;'"/>
+                    <xsl:with-param name="to" select="'&amp;lt;'"/>
+                  </xsl:call-template>
+                </xsl:with-param>
+                <xsl:with-param name="from" select="'&gt;'"/>
+                <xsl:with-param name="to" select="'&amp;gt;'"/>
+              </xsl:call-template>
+            </xsl:with-param>
+            <xsl:with-param name="from" select="'&quot;'"/>
+            <xsl:with-param name="to" select="'&amp;quot;'"/>
+          </xsl:call-template>
+        </xsl:with-param>
+        <xsl:with-param name="from" select="'&#160;'"/>
+        <xsl:with-param name="to" select="'&amp;#160;'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:call-template name="character-reference">
+      <xsl:with-param name="text" select="$escaped-text"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="percent-encoding">
+    <xsl:param name="text" select="''"/>
+    <xsl:call-template name="replace-character">
+      <xsl:with-param name="text">
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text">
+            <xsl:call-template name="replace-character">
+              <xsl:with-param name="text">
+                <xsl:call-template name="replace-character">
+                  <xsl:with-param name="text">
+                    <xsl:call-template name="replace-character">
+                      <xsl:with-param name="text">
+                        <xsl:call-template name="replace-character">
+                          <xsl:with-param name="text">
+                            <xsl:call-template name="replace-character">
+                              <xsl:with-param name="text">
+                                <xsl:call-template name="replace-character">
+                                  <xsl:with-param name="text">
+                                    <xsl:call-template name="replace-character">
+                                      <xsl:with-param name="text">
+                                        <xsl:call-template name="replace-character">
+                                          <xsl:with-param name="text" select="$text"/>
+                                          <xsl:with-param name="from" select="' '"/>
+                                          <xsl:with-param name="to" select="'%20'"/>
+                                        </xsl:call-template>
+                                      </xsl:with-param>
+                                      <xsl:with-param name="from" select="'&#10;'"/>
+                                      <xsl:with-param name="to" select="'%0A'"/>
+                                    </xsl:call-template>
+                                  </xsl:with-param>
+                                  <xsl:with-param name="from" select="'&quot;'"/>
+                                  <xsl:with-param name="to" select="'%22'"/>
+                                </xsl:call-template>
+                              </xsl:with-param>
+                              <xsl:with-param name="from" select="'$'"/>
+                              <xsl:with-param name="to" select="'%24'"/>
+                            </xsl:call-template>
+                          </xsl:with-param>
+                          <xsl:with-param name="from" select="'@'"/>
+                          <xsl:with-param name="to" select="'%40'"/>
+                        </xsl:call-template>
+                      </xsl:with-param>
+                      <xsl:with-param name="from" select="'\'"/>
+                      <xsl:with-param name="to" select="'%5C'"/>
+                    </xsl:call-template>
+                  </xsl:with-param>
+                  <xsl:with-param name="from" select="':'"/>
+                  <xsl:with-param name="to" select="'%3A'"/>
+                </xsl:call-template>
+              </xsl:with-param>
+              <xsl:with-param name="from" select="';'"/>
+              <xsl:with-param name="to" select="'%3B'"/>
+            </xsl:call-template>
+          </xsl:with-param>
+          <xsl:with-param name="from" select="'}'"/>
+          <xsl:with-param name="to" select="'%7D'"/>
+        </xsl:call-template>
+      </xsl:with-param>
+      <xsl:with-param name="from" select="'{'"/>
+      <xsl:with-param name="to" select="'%7B'"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="replace-character">
     <xsl:param name="text"/>
     <xsl:param name="from"/>
     <xsl:param name="to"/>
-    <xsl:if test="starts-with($text, $from)">
-      <xsl:choose>
-        <xsl:when test="starts-with($to, '&amp;') and substring($to, string-length($to), 1) = ';'">
-          <span class="character-reference" title="{$from}">
-            <xsl:value-of select="$to"/>
-          </span>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$to"/>
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:call-template name="replace-character">
-        <xsl:with-param name="text" select="substring-after($text, $from)"/>
-      </xsl:call-template>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="contains($text, $from)">
+        <xsl:value-of select="concat(substring-before($text, $from), $to)"/>
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="substring-after($text, $from)"/>
+          <xsl:with-param name="from" select="$from"/>
+          <xsl:with-param name="to" select="$to"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="stylesheet"><![CDATA[/* layout */
+  <xsl:template name="stylesheet"><![CDATA[@charset "UTF-8";
+
+/* layout */
 * {
   margin: 0;
   padding: 0;
