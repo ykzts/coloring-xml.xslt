@@ -667,6 +667,7 @@ body {
   var document = window.document;
 
   function SiteScript() {
+    this.tags = [];
   }
 
   (function(proto) {
@@ -679,9 +680,10 @@ body {
 
     proto.domContentLoaded = function domContentLoaded(event) {
       var nodes = document.querySelectorAll('.tag:not(:only-child)');
-      [].forEach.call(nodes, function(node) {
-        node.addEventListener('click', new Tag(node), false);
+      var tags = [].map.call(nodes, function(node) {
+        return new Tag(node);
       });
+      this.tags = this.tags.concat(tags);
     };
   })(SiteScript.prototype);
 
@@ -695,11 +697,37 @@ body {
     if (!this.classList.contains('tag')) {
       throw new TypeError('Node is should has class attribute contains of value is tag.');
     }
+    this.node.addEventListener('click', this, false);
   }
+
+  Tag.CLOSED_STATE_CLASS_NAME = 'closed';
 
   (function(proto) {
     proto.handleEvent = function handleEvent(event) {
-      this.parentClassList.toggle('closed');
+      var type = event.type;
+      if (type === 'click') {
+        this.toggle();
+      }
+    };
+
+    proto.isClosed = function isClosed() {
+      return this.parentClassList.contains(Tag.CLOSED_STATE_CLASS_NAME);
+    };
+
+    proto.close = function toggle() {
+      if (!this.isClosed()) {
+        this.parentClassList.add(Tag.CLOSED_STATE_CLASS_NAME);
+      }
+    };
+
+    proto.open = function open() {
+      if (this.isClosed()) {
+        this.parentClassList.remove(Tag.CLOSED_STATE_CLASS_NAME);
+      }
+    };
+
+    proto.toggle = function toggle() {
+      this.parentClassList.toggle(Tag.CLOSED_STATE_CLASS_NAME);
     };
   })(Tag.prototype);
 
