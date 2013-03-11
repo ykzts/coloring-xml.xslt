@@ -448,10 +448,12 @@
     <xsl:param name="content-type">text/plain</xsl:param>
     <xsl:param name="charset">UTF-8</xsl:param>
     <xsl:param name="text" select="''"/>
-    <xsl:value-of select="concat('data:', $content-type, ';charset=', $charset, ',')"/>
-    <xsl:call-template name="percent-encoding">
-      <xsl:with-param name="text" select="$text"/>
-    </xsl:call-template>
+    <xsl:variable name="encoded-text">
+      <xsl:call-template name="percent-encoding">
+        <xsl:with-param name="text" select="$text"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:value-of select="concat('data:', $content-type, ';charset=', $charset, ',', $encoded-text)"/>
   </xsl:template>
 
   <xsl:template name="escape">
