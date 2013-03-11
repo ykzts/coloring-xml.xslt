@@ -59,11 +59,11 @@
             <xsl:call-template name="data-uri">
               <xsl:with-param name="content-type">text/css</xsl:with-param>
               <xsl:with-param name="text">
-                <xsl:call-template name="stylesheet"/>
+                <xsl:call-template name="main.css"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
-         </link>
+        </link>
         <title>
           <xsl:value-of select="concat(name(*), ' document')"/>
         </title>
@@ -80,7 +80,7 @@
             <xsl:call-template name="data-uri">
               <xsl:with-param name="content-type">application/javascript</xsl:with-param>
               <xsl:with-param name="text">
-                <xsl:call-template name="script"/>
+                <xsl:call-template name="site-script.js"/>
               </xsl:with-param>
             </xsl:call-template>
           </xsl:attribute>
@@ -515,7 +515,13 @@
                                     <xsl:call-template name="replace-character">
                                       <xsl:with-param name="text">
                                         <xsl:call-template name="replace-character">
-                                          <xsl:with-param name="text" select="$text"/>
+                                          <xsl:with-param name="text">
+                                            <xsl:call-template name="replace-character">
+                                              <xsl:with-param name="text" select="$text"/>
+                                              <xsl:with-param name="from" select="'%'"/>
+                                              <xsl:with-param name="to" select="'%25'"/>
+                                            </xsl:call-template>
+                                          </xsl:with-param>
                                           <xsl:with-param name="from" select="' '"/>
                                           <xsl:with-param name="to" select="'%20'"/>
                                         </xsl:call-template>
@@ -576,7 +582,29 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template name="stylesheet"><![CDATA[@charset "UTF-8";
+  <xsl:template name="main.css">
+    <xsl:variable name="layout.css">
+      <xsl:call-template name="data-uri">
+        <xsl:with-param name="content-type" select="'text/css'"/>
+        <xsl:with-param name="text">
+          <xsl:call-template name="layout.css"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="color.css">
+      <xsl:call-template name="data-uri">
+        <xsl:with-param name="content-type" select="'text/css'"/>
+        <xsl:with-param name="text">
+          <xsl:call-template name="color.css"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:text>@charset &quot;UTF-8&quot;;&#10;&#10;</xsl:text>
+    <xsl:value-of select="concat('@import &quot;', $layout.css, '&quot;;&#10;')"/>
+    <xsl:value-of select="concat('@import &quot;', $color.css, '&quot;;&#10;')"/>
+  </xsl:template>
+
+  <xsl:template name="layout.css"><![CDATA[@charset "UTF-8";
 
 /* layout */
 * {
@@ -621,7 +649,9 @@ li.closed > .tag:first-child:not(:only-child)::after {
 
 li.closed > :not(.tag) {
   display: none;
-}
+}]]></xsl:template>
+
+  <xsl:template name="color.css"><![CDATA[@charset "UTF-8";
 
 /* color */
 body {
@@ -660,7 +690,7 @@ body {
   color: lime;
 }]]></xsl:template>
 
-  <xsl:template name="script"><![CDATA[(function(global, undefined) {
+  <xsl:template name="site-script.js"><![CDATA[(function(global, undefined) {
   'use strict';
 
   var window = global.window || {};
