@@ -20,6 +20,10 @@ or
 $ xsltproc coloring-xml.xslt document.xml > document.html
 ```
 
+or
+
+[using W3C XSLT Servlet](http://services.w3.org/xslt?xslfile=https%3A%2F%2Fraw.github.com%2Fykzts%2Fcoloring-xml.xslt%2Fmaster%2Fcoloring-xml.xslt;xmlfile=https%3A%2F%2Fraw.github.com%2Fykzts%2Fcoloring-xml.xslt%2Fmaster%2Fcoloring-xml.xslt)
+
 ## License
 
 [MIT License](LICENSE)
