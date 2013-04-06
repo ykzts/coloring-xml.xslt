@@ -54,6 +54,8 @@
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset={$encoding}"/>
+        <meta http-equiv="Content-Style-Type" content="text/css"/>
+        <meta http-equiv="Content-Script-Type" content="application/javascript"/>
         <link rel="stylesheet" type="text/css">
           <xsl:attribute name="href">
             <xsl:call-template name="data-uri">
