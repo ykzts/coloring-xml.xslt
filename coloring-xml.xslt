@@ -677,7 +677,7 @@
                                           <xsl:with-param name="to" select="'%20'"/>
                                         </xsl:call-template>
                                       </xsl:with-param>
-                                      <xsl:with-param name="from" select="'&#10;'"/>
+                                      <xsl:with-param name="from" select="$lf"/>
                                       <xsl:with-param name="to" select="'%0A'"/>
                                     </xsl:call-template>
                                   </xsl:with-param>
@@ -750,9 +750,10 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:text>@charset &quot;UTF-8&quot;;&#10;&#10;</xsl:text>
-    <xsl:value-of select="concat('@import &quot;', $layout.css, '&quot;;&#10;')"/>
-    <xsl:value-of select="concat('@import &quot;', $color.css, '&quot;;&#10;')"/>
+    <xsl:text>@charset &quot;UTF-8&quot;;</xsl:text>
+    <xsl:value-of select="concat($lf, $lf)"/>
+    <xsl:value-of select="concat('@import &quot;', $layout.css, '&quot;;', $lf)"/>
+    <xsl:value-of select="concat('@import &quot;', $color.css, '&quot;;', $lf)"/>
   </xsl:template>
 
   <xsl:template name="layout.css"><![CDATA[@charset "UTF-8";
