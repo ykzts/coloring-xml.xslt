@@ -189,7 +189,20 @@
     <li>
       <span class="comment">
         <xsl:text>&lt;!--</xsl:text>
-        <xsl:value-of select="."/>
+        <xsl:choose>
+          <xsl:when test="contains(., $lf) or contains(., $cr)">
+            <xsl:call-template name="plain-text-lines">
+              <xsl:with-param name="text" select="."/>
+              <xsl:with-param name="escape" select="false()"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="plain-text">
+              <xsl:with-param name="text" select="."/>
+              <xsl:with-param name="escape" select="false()"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
         <xsl:text>--&gt;</xsl:text>
       </span>
     </li>
@@ -232,9 +245,11 @@
   <xsl:template name="text-node-multiple-lines">
     <xsl:param name="text" select="."/>
     <ol>
-      <xsl:call-template name="plain-text-lines">
-        <xsl:with-param name="text" select="$text"/>
-      </xsl:call-template>
+      <li>
+        <xsl:call-template name="plain-text-lines">
+          <xsl:with-param name="text" select="$text"/>
+        </xsl:call-template>
+      </li>
     </ol>
   </xsl:template>
 
@@ -435,15 +450,35 @@
 
   <xsl:template name="plain-text">
     <xsl:param name="text" select="."/>
+    <xsl:param name="escape" select="true()"/>
     <span class="text">
-      <xsl:call-template name="escape">
-        <xsl:with-param name="text" select="$text"/>
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$escape">
+          <xsl:call-template name="escape">
+            <xsl:with-param name="text" select="$text"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$text"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </span>
   </xsl:template>
 
   <xsl:template name="plain-text-lines">
     <xsl:param name="text" select="."/>
+    <xsl:param name="escape" select="true()"/>
+    <div class="text">
+      <xsl:call-template name="plain-text-line">
+        <xsl:with-param name="text" select="$text"/>
+        <xsl:with-param name="escape" select="$escape"/>
+      </xsl:call-template>
+    </div>
+  </xsl:template>
+
+  <xsl:template name="plain-text-line">
+    <xsl:param name="text" select="."/>
+    <xsl:param name="escape" select="true()"/>
     <xsl:variable name="crlf-position" select="string-length(substring-before($text, concat($cr, $lf)))"/>
     <xsl:variable name="lf-position" select="string-length(substring-before($text, $lf))"/>
     <xsl:variable name="cr-position" select="string-length(substring-before($text, $cr))"/>
@@ -475,21 +510,23 @@
         <xsl:value-of select="substring-after($text, $first-newline)"/>
       </xsl:if>
     </xsl:variable>
-    <li>
+    <div class="text-line">
       <xsl:choose>
         <xsl:when test="string-length($before-first-newline) &gt; 0">
           <xsl:call-template name="plain-text">
             <xsl:with-param name="text" select="$before-first-newline"/>
+            <xsl:with-param name="escape" select="$escape"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>&#160;</xsl:text>
         </xsl:otherwise>
       </xsl:choose>
-    </li>
+    </div>
     <xsl:if test="string-length($after-first-newline) &gt; 0">
-      <xsl:call-template name="plain-text-lines">
+      <xsl:call-template name="plain-text-line">
         <xsl:with-param name="text" select="$after-first-newline"/>
+        <xsl:with-param name="escape" select="$escape"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
