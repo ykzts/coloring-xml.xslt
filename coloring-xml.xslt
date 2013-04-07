@@ -19,6 +19,8 @@
   </xsl:param>
   <xsl:variable name="upper-case">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
   <xsl:variable name="lower-case">abcdefghijklmnopqrstuvwxyz</xsl:variable>
+  <xsl:variable name="lf" select="'&#10;'"/>
+  <xsl:variable name="cr" select="'&#13;'"/>
   <xsl:strip-space elements="*"/>
   <xsl:output method="xml" encoding="UTF-8" omit-xml-declaration="no" media-type="application/xhtml+xml" indent="no" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN" doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"/>
 
@@ -209,7 +211,12 @@
   <xsl:template name="text-node">
     <xsl:param name="text" select="."/>
     <xsl:choose>
-      <xsl:when test="string-length(.) &gt; 100">
+      <xsl:when test="contains($text, $lf) or contains($text, $cr)">
+        <xsl:call-template name="text-node-multiple-lines">
+          <xsl:with-param name="text" select="$text"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="string-length($text) &gt; 100">
         <xsl:call-template name="text-node-long">
           <xsl:with-param name="text" select="$text"/>
         </xsl:call-template>
@@ -220,6 +227,15 @@
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="text-node-multiple-lines">
+    <xsl:param name="text" select="."/>
+    <ol>
+      <xsl:call-template name="plain-text-lines">
+        <xsl:with-param name="text" select="$text"/>
+      </xsl:call-template>
+    </ol>
   </xsl:template>
 
   <xsl:template name="text-node-long">
@@ -424,6 +440,58 @@
         <xsl:with-param name="text" select="$text"/>
       </xsl:call-template>
     </span>
+  </xsl:template>
+
+  <xsl:template name="plain-text-lines">
+    <xsl:param name="text" select="."/>
+    <xsl:variable name="crlf-position" select="string-length(substring-before($text, concat($cr, $lf)))"/>
+    <xsl:variable name="lf-position" select="string-length(substring-before($text, $lf))"/>
+    <xsl:variable name="cr-position" select="string-length(substring-before($text, $cr))"/>
+    <xsl:variable name="first-newline">
+      <xsl:choose>
+        <xsl:when test="contains($text, concat($cr, $lf)) and (($lf-position = 0 and $cr-position = 0) or ($crlf-position &lt; $lf-position and $crlf-position &lt; $cr-position))">
+          <xsl:value-of select="concat($cr, $lf)"/>
+        </xsl:when>
+        <xsl:when test="contains($text, $lf) and (($crlf-position = 0 and $cr-position = 0) or ($lf-position &lt; $crlf-position and $lf-position &lt; $cr-position))">
+          <xsl:value-of select="$lf"/>
+        </xsl:when>
+        <xsl:when test="contains($text, $lf) and (($crlf-position = 0 and $lf-position = 0) or ($cr-position &lt; $crlf-position and $cr-position &lt; $lf-position))">
+          <xsl:value-of select="$cr"/>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="before-first-newline">
+      <xsl:choose>
+        <xsl:when test="string-length($first-newline) &gt; 0">
+          <xsl:value-of select="substring-before($text, $first-newline)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$text"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="after-first-newline">
+      <xsl:if test="$before-first-newline != $text">
+        <xsl:value-of select="substring-after($text, $first-newline)"/>
+      </xsl:if>
+    </xsl:variable>
+    <li>
+      <xsl:choose>
+        <xsl:when test="string-length($before-first-newline) &gt; 0">
+          <xsl:call-template name="plain-text">
+            <xsl:with-param name="text" select="$before-first-newline"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>&#160;</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </li>
+    <xsl:if test="string-length($after-first-newline) &gt; 0">
+      <xsl:call-template name="plain-text-lines">
+        <xsl:with-param name="text" select="$after-first-newline"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="character-reference">
