@@ -216,27 +216,54 @@
         </li>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:call-template name="text-node"/>
+        <xsl:choose>
+          <xsl:when test="(contains(., $lf) or contains(., $cr)) and (contains(., '&lt;') or contains(., '&gt;') or contains(., '&amp;') or contains(., '&quot;'))">
+            <ol>
+              <li>
+                <span class="section">
+                  <xsl:text>&lt;![</xsl:text>
+                  <span class="name">CDATA</span>
+                  <xsl:text>[</xsl:text>
+                </span>
+              </li>
+              <xsl:call-template name="text-node">
+                <xsl:with-param name="escape" select="false()"/>
+              </xsl:call-template>
+              <li>
+                <span class="section">
+                  <xsl:text>]]&gt;</xsl:text>
+                </span>
+              </li>
+            </ol>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="text-node"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template name="text-node">
     <xsl:param name="text" select="."/>
+    <xsl:param name="escape" select="true()"/>
     <xsl:choose>
       <xsl:when test="contains($text, $lf) or contains($text, $cr)">
         <xsl:call-template name="text-node-multiple-lines">
           <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="escape" select="$escape"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:when test="string-length($text) &gt; 100">
         <xsl:call-template name="text-node-long">
           <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="escape" select="$escape"/>
         </xsl:call-template>
       </xsl:when>
       <xsl:otherwise>
         <xsl:call-template name="plain-text">
           <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="escape" select="$escape"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -244,10 +271,12 @@
 
   <xsl:template name="text-node-multiple-lines">
     <xsl:param name="text" select="."/>
+    <xsl:param name="escape" select="true()"/>
     <ol>
       <li>
         <xsl:call-template name="plain-text-lines">
           <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="escape" select="$escape"/>
         </xsl:call-template>
       </li>
     </ol>
@@ -255,10 +284,12 @@
 
   <xsl:template name="text-node-long">
     <xsl:param name="text" select="."/>
+    <xsl:param name="escape" select="true()"/>
     <ol>
       <li>
         <xsl:call-template name="plain-text">
           <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="escape" select="$escape"/>
         </xsl:call-template>
       </li>
     </ol>
@@ -787,6 +818,10 @@ body {
 
 .attribute .value {
   color: green;
+}
+
+.section .name {
+  color: blue;
 }
 
 .comment {
