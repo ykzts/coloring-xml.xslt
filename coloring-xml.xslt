@@ -875,6 +875,17 @@ body {
   Tag.CLOSED_STATE_CLASS_NAME = 'closed';
 
   (function(proto) {
+    Object.defineProperty(proto, 'closed', {
+      configurable: true,
+      get: function() {
+        return this.parentClassList.contains(Tag.CLOSED_STATE_CLASS_NAME);
+      },
+      enumerable: true,
+      set: function(state) {
+        return this[!state ? 'open' : 'close']();
+      }
+    });
+
     proto.handleEvent = function handleEvent(event) {
       var type = event.type;
       if (type === 'click') {
@@ -882,18 +893,14 @@ body {
       }
     };
 
-    proto.isClosed = function isClosed() {
-      return this.parentClassList.contains(Tag.CLOSED_STATE_CLASS_NAME);
-    };
-
     proto.close = function toggle() {
-      if (!this.isClosed()) {
+      if (!this.closed) {
         this.parentClassList.add(Tag.CLOSED_STATE_CLASS_NAME);
       }
     };
 
     proto.open = function open() {
-      if (this.isClosed()) {
+      if (this.closed) {
         this.parentClassList.remove(Tag.CLOSED_STATE_CLASS_NAME);
       }
     };
