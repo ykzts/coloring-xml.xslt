@@ -17,6 +17,16 @@
   <xsl:param name="encoding">
     <xsl:call-template name="guess-encoding"/>
   </xsl:param>
+  <xsl:param name="xmlfile">
+    <!-- For W3C XSLT Servlet -->
+  </xsl:param>
+  <xsl:param name="original-uri">
+    <xsl:choose>
+      <xsl:when test="string-length($xmlfile) &gt; 0">
+        <xsl:value-of select="$xmlfile"/>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:param>
   <xsl:variable name="upper-case">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
   <xsl:variable name="lower-case">abcdefghijklmnopqrstuvwxyz</xsl:variable>
   <xsl:variable name="lf" select="'&#10;'"/>
@@ -55,6 +65,9 @@
   <xsl:template match="/">
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
+        <xsl:if test="string-length($original-uri) &gt; 0">
+          <base href="{$original-uri}"/>
+        </xsl:if>
         <meta http-equiv="Content-Type" content="text/html; charset={$encoding}"/>
         <meta http-equiv="Content-Style-Type" content="text/css"/>
         <meta http-equiv="Content-Script-Type" content="application/javascript"/>
