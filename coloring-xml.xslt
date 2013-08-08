@@ -239,9 +239,11 @@
                   <xsl:text>[</xsl:text>
                 </span>
               </li>
-              <xsl:call-template name="text-node">
-                <xsl:with-param name="escape" select="false()"/>
-              </xsl:call-template>
+              <li>
+                <xsl:call-template name="text-node">
+                  <xsl:with-param name="escape" select="false()"/>
+                </xsl:call-template>
+              </li>
               <li>
                 <span class="section">
                   <xsl:text>]]&gt;</xsl:text>
