@@ -63,6 +63,22 @@
   </xsl:template>
 
   <xsl:template match="/">
+    <xsl:variable name="stylesheet-uri">
+      <xsl:call-template name="data-uri">
+        <xsl:with-param name="content-type">text/css</xsl:with-param>
+        <xsl:with-param name="text">
+          <xsl:call-template name="main.css"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="script-uri">
+      <xsl:call-template name="data-uri">
+        <xsl:with-param name="content-type">application/javascript</xsl:with-param>
+        <xsl:with-param name="text">
+          <xsl:call-template name="site-script.js"/>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:variable>
     <html xml:lang="{$lang}" lang="{$lang}">
       <head>
         <xsl:if test="string-length($original-uri) &gt; 0">
@@ -71,15 +87,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset={$encoding}"/>
         <meta http-equiv="Content-Style-Type" content="text/css"/>
         <meta http-equiv="Content-Script-Type" content="application/javascript"/>
-        <link rel="stylesheet" type="text/css">
-          <xsl:attribute name="href">
-            <xsl:call-template name="data-uri">
-              <xsl:with-param name="content-type">text/css</xsl:with-param>
-              <xsl:with-param name="text">
-                <xsl:call-template name="main.css"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
+        <link href="{$stylesheet-uri}" rel="stylesheet" type="text/css">
         </link>
         <title>
           <xsl:value-of select="concat(name(*), ' document')"/>
@@ -92,16 +100,7 @@
           </li>
           <xsl:apply-templates/>
         </ol>
-        <script type="application/javascript">
-          <xsl:attribute name="src">
-            <xsl:call-template name="data-uri">
-              <xsl:with-param name="content-type">application/javascript</xsl:with-param>
-              <xsl:with-param name="text">
-                <xsl:call-template name="site-script.js"/>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:attribute>
-        </script>
+        <script src="{$script-uri}" type="application/javascript"/>
       </body>
     </html>
   </xsl:template>
