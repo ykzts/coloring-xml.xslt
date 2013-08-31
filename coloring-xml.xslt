@@ -2,12 +2,13 @@
 <?xml-stylesheet type="application/xml" href=""?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" exclude-result-prefixes="xhtml xsl" xml:lang="en">
   <xsl:param name="lang">
+    <xsl:variable name="root" select="/*"/>
     <xsl:choose>
-      <xsl:when test="/*/@xml:lang">
-        <xsl:value-of select="/*/@xml:lang"/>
+      <xsl:when test="$root/@xml:lang">
+        <xsl:value-of select="$root/@xml:lang"/>
       </xsl:when>
-      <xsl:when test="/*/@lang">
-        <xsl:value-of select="/*/@lang"/>
+      <xsl:when test="$root/@lang">
+        <xsl:value-of select="$root/@lang"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>en</xsl:text>
