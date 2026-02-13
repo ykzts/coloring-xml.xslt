@@ -803,10 +803,10 @@ body {
 
 ol {
   list-style: none;
-}
 
-ol ol {
-  margin-left: 1em;
+  ol {
+    margin-left: 1em;
+  }
 }
 
 li {
@@ -824,24 +824,27 @@ a {
 
 .tag[role="button"] {
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
 }
 
-.tag[role="button"]:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
+li.closed {
+  > .tag {
+    display: inline;
 
-li.closed > .tag {
-  display: inline;
-}
+    &:first-child:not(:only-child)::after {
+      content: "...";
+    }
+  }
 
-li.closed > .tag:first-child:not(:only-child)::after {
-  content: "...";
+  > :not(.tag) {
+    display: none;
+  }
 }
-
-li.closed > :not(.tag) {
-  display: none;
-}]]></xsl:template>
+]]></xsl:template>
 
   <xsl:template name="color.css"><![CDATA[@charset "UTF-8";
 
@@ -909,14 +912,17 @@ body {
 
 .character-reference {
   color: var(--character-ref);
-}]]></xsl:template>
+}
+]]></xsl:template>
 
   <xsl:template name="site-script.js"><![CDATA[document.addEventListener('click', (event) => {
   const node = event.target.closest('.tag:not(:only-child)');
+  if (!node) return;
 
-  if (!node?.parentElement.matches('li:has(ol)')) return;
+  const parent = node.parentElement;
+  if (!parent || !parent.matches('li:has(ol)')) return;
 
-  node.parentElement.classList.toggle('closed');
+  parent.classList.toggle('closed');
 });
 ]]></xsl:template>
 </xsl:stylesheet>
