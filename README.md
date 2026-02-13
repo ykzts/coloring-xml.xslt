@@ -1,10 +1,15 @@
 # coloring-xml.xslt
 
-Coloring to xml document using XSLT stylesheet! I love XSLT!!! XSLT is a greatest amazing specification from W3C!
+XSLT 1.0 stylesheet that renders XML as readable, colorized HTML. Built for quick inspection and works well with modern browsers.
 
-[![Coloring](http://ec2.images-amazon.com/images/I/51fAXgKtqhL.jpg)](http://www.amazon.co.jp/dp/B005XOK9R2)
+## Features
 
-## Example for using
+- Syntax highlighting with CSS variables (easy theming + dark mode)
+- Collapsible elements
+- Accessible focus styles for interactive tags
+- Works offline (data URI for CSS/JS)
+
+## Usage
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -14,15 +19,21 @@ Coloring to xml document using XSLT stylesheet! I love XSLT!!! XSLT is a greates
 </document>
 ```
 
-or
+Or
 
 ```shell
 $ xsltproc coloring-xml.xslt document.xml > document.html
 ```
 
-or
+Or
 
-[using W3C XSLT Servlet](http://services.w3.org/xslt?xslfile=https%3A%2F%2Fraw.github.com%2Fykzts%2Fcoloring-xml.xslt%2Fmaster%2Fcoloring-xml.xslt;xmlfile=https%3A%2F%2Fraw.github.com%2Fykzts%2Fcoloring-xml.xslt%2Fmaster%2Fcoloring-xml.xslt)
+Use the W3C XSLT Servlet:
+
+- https://services.w3.org/xslt?xslfile=https%3A%2F%2Fraw.githubusercontent.com%2Fykzts%2Fcoloring-xml.xslt%2Fmaster%2Fcoloring-xml.xslt;xmlfile=https%3A%2F%2Fraw.githubusercontent.com%2Fykzts%2Fcoloring-xml.xslt%2Fmaster%2Fcoloring-xml.xslt
+
+## Notes
+
+- If you need external assets, host the CSS/JS and replace the data URI templates.
 
 ## License
 
