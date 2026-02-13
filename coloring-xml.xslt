@@ -85,11 +85,8 @@
         <xsl:if test="string-length($original-uri) &gt; 0">
           <base href="{$original-uri}"/>
         </xsl:if>
-        <meta http-equiv="Content-Type" content="text/html; charset={$encoding}"/>
-        <meta http-equiv="Content-Style-Type" content="text/css"/>
-        <meta http-equiv="Content-Script-Type" content="application/javascript"/>
-        <link href="{$stylesheet-uri}" rel="stylesheet" type="text/css">
-        </link>
+        <meta charset="{$encoding}"/>
+        <link href="{$stylesheet-uri}" rel="stylesheet"/>
         <title>
           <xsl:value-of select="concat(name(*), ' document')"/>
         </title>
@@ -101,7 +98,7 @@
           </li>
           <xsl:apply-templates/>
         </ol>
-        <script src="{$script-uri}" type="application/javascript"/>
+        <script src="{$script-uri}"/>
       </body>
     </html>
   </xsl:template>
@@ -368,6 +365,8 @@
     </xsl:variable>
     <xsl:element name="{$element-name}">
       <xsl:attribute name="class">tag</xsl:attribute>
+      <xsl:attribute name="role">button</xsl:attribute>
+      <xsl:attribute name="tabindex">0</xsl:attribute>
       <xsl:text>&lt;</xsl:text>
       <xsl:if test="$is-close-tag">
         <xsl:text>/</xsl:text>
@@ -612,35 +611,42 @@
   <xsl:template name="escape">
     <xsl:param name="text"/>
     <xsl:variable name="escaped-text">
-      <xsl:call-template name="replace-character">
-        <xsl:with-param name="text">
-          <xsl:call-template name="replace-character">
-            <xsl:with-param name="text">
-              <xsl:call-template name="replace-character">
-                <xsl:with-param name="text">
-                  <xsl:call-template name="replace-character">
-                    <xsl:with-param name="text">
-                      <xsl:call-template name="replace-character">
-                        <xsl:with-param name="text" select="$text"/>
-                        <xsl:with-param name="from" select="'&amp;'"/>
-                        <xsl:with-param name="to" select="'&amp;amp;'"/>
-                      </xsl:call-template>
-                    </xsl:with-param>
-                    <xsl:with-param name="from" select="'&lt;'"/>
-                    <xsl:with-param name="to" select="'&amp;lt;'"/>
-                  </xsl:call-template>
-                </xsl:with-param>
-                <xsl:with-param name="from" select="'&gt;'"/>
-                <xsl:with-param name="to" select="'&amp;gt;'"/>
-              </xsl:call-template>
-            </xsl:with-param>
-            <xsl:with-param name="from" select="'&quot;'"/>
-            <xsl:with-param name="to" select="'&amp;quot;'"/>
-          </xsl:call-template>
-        </xsl:with-param>
-        <xsl:with-param name="from" select="'&#160;'"/>
-        <xsl:with-param name="to" select="'&amp;#160;'"/>
-      </xsl:call-template>
+      <xsl:variable name="t1">
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="$text"/>
+          <xsl:with-param name="from" select="'&amp;'"/>
+          <xsl:with-param name="to" select="'&amp;amp;'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="t2">
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="$t1"/>
+          <xsl:with-param name="from" select="'&lt;'"/>
+          <xsl:with-param name="to" select="'&amp;lt;'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="t3">
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="$t2"/>
+          <xsl:with-param name="from" select="'&gt;'"/>
+          <xsl:with-param name="to" select="'&amp;gt;'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="t4">
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="$t3"/>
+          <xsl:with-param name="from" select="'&quot;'"/>
+          <xsl:with-param name="to" select="'&amp;quot;'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="t5">
+        <xsl:call-template name="replace-character">
+          <xsl:with-param name="text" select="$t4"/>
+          <xsl:with-param name="from" select="'&#160;'"/>
+          <xsl:with-param name="to" select="'&amp;#160;'"/>
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="$t5"/>
     </xsl:variable>
     <xsl:call-template name="character-reference">
       <xsl:with-param name="text" select="$escaped-text"/>
@@ -649,71 +655,93 @@
 
   <xsl:template name="percent-encoding">
     <xsl:param name="text" select="''"/>
-    <xsl:call-template name="replace-character">
-      <xsl:with-param name="text">
-        <xsl:call-template name="replace-character">
-          <xsl:with-param name="text">
-            <xsl:call-template name="replace-character">
-              <xsl:with-param name="text">
-                <xsl:call-template name="replace-character">
-                  <xsl:with-param name="text">
-                    <xsl:call-template name="replace-character">
-                      <xsl:with-param name="text">
-                        <xsl:call-template name="replace-character">
-                          <xsl:with-param name="text">
-                            <xsl:call-template name="replace-character">
-                              <xsl:with-param name="text">
-                                <xsl:call-template name="replace-character">
-                                  <xsl:with-param name="text">
-                                    <xsl:call-template name="replace-character">
-                                      <xsl:with-param name="text">
-                                        <xsl:call-template name="replace-character">
-                                          <xsl:with-param name="text">
-                                            <xsl:call-template name="replace-character">
-                                              <xsl:with-param name="text" select="$text"/>
-                                              <xsl:with-param name="from" select="'%'"/>
-                                              <xsl:with-param name="to" select="'%25'"/>
-                                            </xsl:call-template>
-                                          </xsl:with-param>
-                                          <xsl:with-param name="from" select="' '"/>
-                                          <xsl:with-param name="to" select="'%20'"/>
-                                        </xsl:call-template>
-                                      </xsl:with-param>
-                                      <xsl:with-param name="from" select="$lf"/>
-                                      <xsl:with-param name="to" select="'%0A'"/>
-                                    </xsl:call-template>
-                                  </xsl:with-param>
-                                  <xsl:with-param name="from" select="'&quot;'"/>
-                                  <xsl:with-param name="to" select="'%22'"/>
-                                </xsl:call-template>
-                              </xsl:with-param>
-                              <xsl:with-param name="from" select="'$'"/>
-                              <xsl:with-param name="to" select="'%24'"/>
-                            </xsl:call-template>
-                          </xsl:with-param>
-                          <xsl:with-param name="from" select="'@'"/>
-                          <xsl:with-param name="to" select="'%40'"/>
-                        </xsl:call-template>
-                      </xsl:with-param>
-                      <xsl:with-param name="from" select="'\'"/>
-                      <xsl:with-param name="to" select="'%5C'"/>
-                    </xsl:call-template>
-                  </xsl:with-param>
-                  <xsl:with-param name="from" select="':'"/>
-                  <xsl:with-param name="to" select="'%3A'"/>
-                </xsl:call-template>
-              </xsl:with-param>
-              <xsl:with-param name="from" select="';'"/>
-              <xsl:with-param name="to" select="'%3B'"/>
-            </xsl:call-template>
-          </xsl:with-param>
-          <xsl:with-param name="from" select="'}'"/>
-          <xsl:with-param name="to" select="'%7D'"/>
-        </xsl:call-template>
-      </xsl:with-param>
-      <xsl:with-param name="from" select="'{'"/>
-      <xsl:with-param name="to" select="'%7B'"/>
-    </xsl:call-template>
+
+    <xsl:variable name="t1">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$text"/>
+        <xsl:with-param name="from" select="'%'"/>
+        <xsl:with-param name="to" select="'%25'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t2">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t1"/>
+        <xsl:with-param name="from" select="' '"/>
+        <xsl:with-param name="to" select="'%20'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t3">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t2"/>
+        <xsl:with-param name="from" select="$lf"/>
+        <xsl:with-param name="to" select="'%0A'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t4">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t3"/>
+        <xsl:with-param name="from" select="'&quot;'"/>
+        <xsl:with-param name="to" select="'%22'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t5">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t4"/>
+        <xsl:with-param name="from" select="'$'"/>
+        <xsl:with-param name="to" select="'%24'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t6">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t5"/>
+        <xsl:with-param name="from" select="'@'"/>
+        <xsl:with-param name="to" select="'%40'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t7">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t6"/>
+        <xsl:with-param name="from" select="'\\'"/>
+        <xsl:with-param name="to" select="'%5C'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t8">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t7"/>
+        <xsl:with-param name="from" select="':'"/>
+        <xsl:with-param name="to" select="'%3A'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t9">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t8"/>
+        <xsl:with-param name="from" select="';'"/>
+        <xsl:with-param name="to" select="'%3B'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t10">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t9"/>
+        <xsl:with-param name="from" select="'}'"/>
+        <xsl:with-param name="to" select="'%7D'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t11">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t10"/>
+        <xsl:with-param name="from" select="'{'"/>
+        <xsl:with-param name="to" select="'%7B'"/>
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="t12">
+      <xsl:call-template name="replace-character">
+        <xsl:with-param name="text" select="$t11"/>
+        <xsl:with-param name="from" select="'#'"/>
+        <xsl:with-param name="to" select="'%23'"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:value-of select="$t12"/>
   </xsl:template>
 
   <xsl:template name="replace-character">
@@ -782,7 +810,7 @@ ol ol {
 }
 
 li {
-  white-space: nowrap;
+  white-space: normal;
 }
 
 a {
@@ -790,7 +818,17 @@ a {
 }
 
 .text {
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tag[role="button"] {
+  cursor: pointer;
+}
+
+.tag[role="button"]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 li.closed > .tag {
@@ -808,130 +846,77 @@ li.closed > :not(.tag) {
   <xsl:template name="color.css"><![CDATA[@charset "UTF-8";
 
 /* color */
+:root {
+  --bg: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #3b82f6;
+  --string: #8b1c2c;
+  --value: #166534;
+  --character-ref: #16a34a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #93c5fd;
+    --accent-soft: #60a5fa;
+    --string: #fca5a5;
+    --value: #86efac;
+    --character-ref: #34d399;
+  }
+}
+
 body {
-  background-color: white;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 .xml-declaration .name {
-  color: aqua;
+  color: var(--accent-soft);
 }
 
 .processing-instruction .name {
-  color: aqua;
+  color: var(--accent-soft);
 }
 
 .processing-instruction .string {
-  color: maroon;
+  color: var(--string);
 }
 
 .tag .name span {
-  color: blue;
+  color: var(--accent);
 }
 
 .attribute .name span {
-  color: maroon;
+  color: var(--string);
 }
 
 .attribute .value {
-  color: green;
+  color: var(--value);
 }
 
 .section .name {
-  color: blue;
+  color: var(--accent);
 }
 
 .comment {
-  color: silver;
+  color: var(--muted);
 }
 
 .character-reference {
-  color: lime;
+  color: var(--character-ref);
 }]]></xsl:template>
 
-  <xsl:template name="site-script.js"><![CDATA[(function(global, undefined) {
-  'use strict';
+  <xsl:template name="site-script.js"><![CDATA[document.addEventListener('click', (event) => {
+  const node = event.target.closest('.tag:not(:only-child)');
 
-  var window = global.window || {};
-  var document = window.document;
+  if (!node?.parentElement.matches('li:has(ol)')) return;
 
-  function SiteScript() {
-    this.tags = [];
-  }
-
-  (function(proto) {
-    proto.handleEvent = function handleEvent(event) {
-      var type = event.type;
-      if (type === 'DOMContentLoaded') {
-        return this.domContentLoaded(event);
-      }
-    };
-
-    proto.domContentLoaded = function domContentLoaded(event) {
-      var nodes = document.querySelectorAll('.tag:not(:only-child)');
-      var tags = [].map.call(nodes, function(node) {
-        return new Tag(node);
-      });
-      this.tags = this.tags.concat(tags);
-    };
-  })(SiteScript.prototype);
-
-  function Tag(node) {
-    if (!((this.node = node) instanceof HTMLElement && (this.parentNode = node.parentNode) instanceof HTMLElement)) {
-      throw new TypeError('This class has argument should contains `HTMLElement` object.');
-    }
-    if (!((this.classList = this.node.classList) instanceof DOMTokenList && (this.parentClassList = this.parentNode.classList) instanceof DOMTokenList)) {
-      throw new TypeError('Should support a `classList` property.');
-    }
-    if (!this.classList.contains('tag')) {
-      throw new TypeError('Node is should has class attribute contains of value is tag.');
-    }
-    this.node.addEventListener('click', this, false);
-  }
-
-  Tag.CLOSED_STATE_CLASS_NAME = 'closed';
-
-  (function(proto) {
-    Object.defineProperty(proto, 'closed', {
-      configurable: true,
-      get: function() {
-        return this.parentClassList.contains(Tag.CLOSED_STATE_CLASS_NAME);
-      },
-      enumerable: true,
-      set: function(state) {
-        return this[!state ? 'open' : 'close']();
-      }
-    });
-
-    proto.handleEvent = function handleEvent(event) {
-      var type = event.type;
-      if (type === 'click') {
-        this.toggle();
-      }
-    };
-
-    proto.close = function toggle() {
-      if (!this.closed) {
-        this.parentClassList.add(Tag.CLOSED_STATE_CLASS_NAME);
-      }
-    };
-
-    proto.open = function open() {
-      if (this.closed) {
-        this.parentClassList.remove(Tag.CLOSED_STATE_CLASS_NAME);
-      }
-    };
-
-    proto.toggle = function toggle() {
-      this.parentClassList.toggle(Tag.CLOSED_STATE_CLASS_NAME);
-    };
-  })(Tag.prototype);
-
-  function main() {
-    window.addEventListener('DOMContentLoaded', new SiteScript(), false);
-  }
-
-  if (window === global) {
-    main();
-  }
-})(this);]]></xsl:template>
+  node.parentElement.classList.toggle('closed');
+});
+]]></xsl:template>
 </xsl:stylesheet>
